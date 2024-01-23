@@ -1,0 +1,27 @@
+service: auth-service
+provider:
+  name: aws
+  profile: me_dev
+  stage: ${opt:stage}
+  region: ap-northeast-1
+  runtime: go1.x
+  memorySize: 128
+package:
+  patterns:
+    - '!*/**'
+    - ./bin/main
+    - .env
+functions:
+    http-proxy:
+      handler: bin/main
+      events:
+        - httpApi: '*'
+      timeout: 30
+plugins:
+  - serverless-offline
+custom:
+  serverless-offline:
+    httpPort: 10000
+    websocketPort: 10001
+    lambdaPort: 10002
+    albPort: 10003
