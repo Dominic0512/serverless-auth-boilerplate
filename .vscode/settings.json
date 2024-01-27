@@ -9,16 +9,16 @@
   },
   "go.lintFlags": ["-checks", "all"],
   "gopls": {
+		"staticcheck": true,
     "analyses": {
-    //   "ST1003": true,
-    //   "ST1016": true,
-    //   "ST1020": true,
-    //   "ST1021": true,
-    //   "ST1022": true,
-    //   "U1000": true
+      "ST1003": false,
+      "ST1016": true,
+      "ST1020": true,
+      "ST1021": true,
+      "ST1022": true,
+      "U1000": true
     },
     "formatting.gofumpt": true,
-    // "staticcheck": true,
     "ui.completion.usePlaceholders": true,
     "ui.diagnostic.analyses": {
       "unusedparams": true

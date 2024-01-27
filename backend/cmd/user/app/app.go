@@ -1,7 +1,7 @@
 package app
 
 import (
-	"github.com/Dominic0512/serverless-auth-boilerplate/cmd/auth/router"
+	"github.com/Dominic0512/serverless-auth-boilerplate/cmd/user/router"
 	"github.com/Dominic0512/serverless-auth-boilerplate/infra/runner"
 	"github.com/google/wire"
 )

@@ -10,11 +10,6 @@ import (
 	"github.com/Dominic0512/serverless-auth-boilerplate/repository"
 )
 
-type CreateUserInput struct {
-	email    string
-	password string
-}
-
 type UserService struct {
 	repo repository.UserRepository
 }
