@@ -47,7 +47,7 @@ func (ac AuthController) SignUp(c *gin.Context) {
 		Password: request.Password,
 	}
 
-	u, err := ac.us.CreateUser(user)
+	u, err := ac.us.Create(user)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Create user failed.",
