@@ -7,11 +7,12 @@
 package main
 
 import (
-	"github.com/Dominic0512/serverless-auth-boilerplate/cmd/auth/app"
-	"github.com/Dominic0512/serverless-auth-boilerplate/cmd/auth/router"
+	"github.com/Dominic0512/serverless-auth-boilerplate/cmd/user/gin/app"
+	"github.com/Dominic0512/serverless-auth-boilerplate/cmd/user/router"
 	"github.com/Dominic0512/serverless-auth-boilerplate/controller"
 	"github.com/Dominic0512/serverless-auth-boilerplate/infra/config"
 	"github.com/Dominic0512/serverless-auth-boilerplate/infra/database"
+	"github.com/Dominic0512/serverless-auth-boilerplate/infra/framework"
 	"github.com/Dominic0512/serverless-auth-boilerplate/infra/runner"
 	"github.com/Dominic0512/serverless-auth-boilerplate/pkg/validate"
 	"github.com/Dominic0512/serverless-auth-boilerplate/repository"
@@ -26,7 +27,7 @@ import (
 // Injectors from wire.go:
 
 func InitializeApp() (*app.App, error) {
-	engine := runner.NewGin()
+	engine := framework.NewGinFramework()
 	baseRoute := route.NewBaseRoute(engine)
 	configConfig, err := config.NewConfig()
 	if err != nil {
@@ -39,11 +40,11 @@ func InitializeApp() (*app.App, error) {
 	userRepository := repository.NewUserRepository(databaseDatabase)
 	userService := service.NewUserService(userRepository)
 	validator := validate.NewValidator()
-	authController := controller.NewAuthController(userService, validator)
-	authRoute := route.NewAuthRoute(engine, authController)
-	routes := router.NewRouter(baseRoute, authRoute)
-	lambdaRunner := runner.NewLambdaRunner(engine)
-	appApp, err := app.NewApp(routes, lambdaRunner)
+	userController := controller.NewUserController(userService, validator)
+	userRoute := route.NewUserRoute(engine, userController)
+	routes := router.NewRouter(baseRoute, userRoute)
+	ginRunner := runner.NewGinRunner(engine)
+	appApp, err := app.NewApp(routes, ginRunner)
 	if err != nil {
 		return nil, err
 	}

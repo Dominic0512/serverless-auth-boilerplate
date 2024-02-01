@@ -67,9 +67,25 @@ func (uc *UserCreate) SetPassword(s string) *UserCreate {
 	return uc
 }
 
+// SetNillablePassword sets the "password" field if the given value is not nil.
+func (uc *UserCreate) SetNillablePassword(s *string) *UserCreate {
+	if s != nil {
+		uc.SetPassword(*s)
+	}
+	return uc
+}
+
 // SetPasswordSalt sets the "passwordSalt" field.
 func (uc *UserCreate) SetPasswordSalt(s string) *UserCreate {
 	uc.mutation.SetPasswordSalt(s)
+	return uc
+}
+
+// SetNillablePasswordSalt sets the "passwordSalt" field if the given value is not nil.
+func (uc *UserCreate) SetNillablePasswordSalt(s *string) *UserCreate {
+	if s != nil {
+		uc.SetPasswordSalt(*s)
+	}
 	return uc
 }
 
@@ -182,12 +198,6 @@ func (uc *UserCreate) check() error {
 	}
 	if _, ok := uc.mutation.Email(); !ok {
 		return &ValidationError{Name: "email", err: errors.New(`ent: missing required field "User.email"`)}
-	}
-	if _, ok := uc.mutation.Password(); !ok {
-		return &ValidationError{Name: "password", err: errors.New(`ent: missing required field "User.password"`)}
-	}
-	if _, ok := uc.mutation.PasswordSalt(); !ok {
-		return &ValidationError{Name: "passwordSalt", err: errors.New(`ent: missing required field "User.passwordSalt"`)}
 	}
 	if _, ok := uc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "createdAt", err: errors.New(`ent: missing required field "User.createdAt"`)}

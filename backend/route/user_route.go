@@ -11,7 +11,7 @@ type UserRoute struct {
 }
 
 func (ur UserRoute) Setup() {
-	user := ur.router.Group("/api/user")
+	user := ur.router.Group("/api/users")
 	{
 		user.GET("", ur.userController.List)
 		user.POST("", ur.userController.Create)

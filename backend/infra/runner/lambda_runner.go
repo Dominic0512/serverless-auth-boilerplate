@@ -13,12 +13,12 @@ type LambdaRunner struct {
 	adapter *ginAdapter.GinLambdaV2
 }
 
-func (r LambdaRunner) Handler(ctx context.Context, req events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
+func (r *LambdaRunner) handler(ctx context.Context, req events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
 	return r.adapter.ProxyWithContext(ctx, req)
 }
 
-func (r LambdaRunner) Run() {
-	lambda.Start(r.Handler)
+func (r *LambdaRunner) Run() {
+	lambda.Start(r.handler)
 }
 
 func NewLambdaRunner(g *gin.Engine) *LambdaRunner {

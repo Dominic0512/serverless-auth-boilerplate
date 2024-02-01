@@ -22,8 +22,12 @@ type CreateUserInput struct {
 	Password string
 }
 
+type MaunipulateUserInput struct {
+	ID string
+}
+
 type UpdateUserInput struct {
-	ID   uuid.UUID
+	ID   string
 	Name string
 }
 

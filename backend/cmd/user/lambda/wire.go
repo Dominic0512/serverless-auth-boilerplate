@@ -4,11 +4,12 @@
 package main
 
 import (
-	"github.com/Dominic0512/serverless-auth-boilerplate/cmd/user/app"
+	"github.com/Dominic0512/serverless-auth-boilerplate/cmd/user/lambda/app"
 	"github.com/Dominic0512/serverless-auth-boilerplate/cmd/user/router"
 	"github.com/Dominic0512/serverless-auth-boilerplate/controller"
 	"github.com/Dominic0512/serverless-auth-boilerplate/infra/config"
 	"github.com/Dominic0512/serverless-auth-boilerplate/infra/database"
+	"github.com/Dominic0512/serverless-auth-boilerplate/infra/framework"
 	"github.com/Dominic0512/serverless-auth-boilerplate/infra/runner"
 	"github.com/Dominic0512/serverless-auth-boilerplate/pkg/validate"
 	"github.com/Dominic0512/serverless-auth-boilerplate/repository"
@@ -21,6 +22,7 @@ func InitializeApp() (*app.App, error) {
 	wire.Build(
 		config.ProviderSet,
 		database.ProviderSet,
+		framework.ProviderSet,
 		repository.ProviderSet,
 		service.ProviderSet,
 		controller.ProviderSet,

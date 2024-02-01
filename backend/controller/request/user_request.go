@@ -1,6 +1,6 @@
 package request
 
-type ManipulateRequest struct {
+type ManipulateUri struct {
 	ID string `uri:"id" validate:"required"`
 }
 

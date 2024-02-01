@@ -326,9 +326,22 @@ func (m *UserMutation) OldPassword(ctx context.Context) (v *string, err error) {
 	return oldValue.Password, nil
 }
 
+// ClearPassword clears the value of the "password" field.
+func (m *UserMutation) ClearPassword() {
+	m.password = nil
+	m.clearedFields[user.FieldPassword] = struct{}{}
+}
+
+// PasswordCleared returns if the "password" field was cleared in this mutation.
+func (m *UserMutation) PasswordCleared() bool {
+	_, ok := m.clearedFields[user.FieldPassword]
+	return ok
+}
+
 // ResetPassword resets all changes to the "password" field.
 func (m *UserMutation) ResetPassword() {
 	m.password = nil
+	delete(m.clearedFields, user.FieldPassword)
 }
 
 // SetPasswordSalt sets the "passwordSalt" field.
@@ -362,9 +375,22 @@ func (m *UserMutation) OldPasswordSalt(ctx context.Context) (v *string, err erro
 	return oldValue.PasswordSalt, nil
 }
 
+// ClearPasswordSalt clears the value of the "passwordSalt" field.
+func (m *UserMutation) ClearPasswordSalt() {
+	m.passwordSalt = nil
+	m.clearedFields[user.FieldPasswordSalt] = struct{}{}
+}
+
+// PasswordSaltCleared returns if the "passwordSalt" field was cleared in this mutation.
+func (m *UserMutation) PasswordSaltCleared() bool {
+	_, ok := m.clearedFields[user.FieldPasswordSalt]
+	return ok
+}
+
 // ResetPasswordSalt resets all changes to the "passwordSalt" field.
 func (m *UserMutation) ResetPasswordSalt() {
 	m.passwordSalt = nil
+	delete(m.clearedFields, user.FieldPasswordSalt)
 }
 
 // SetCreatedAt sets the "createdAt" field.
@@ -591,7 +617,14 @@ func (m *UserMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *UserMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(user.FieldPassword) {
+		fields = append(fields, user.FieldPassword)
+	}
+	if m.FieldCleared(user.FieldPasswordSalt) {
+		fields = append(fields, user.FieldPasswordSalt)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -604,6 +637,14 @@ func (m *UserMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *UserMutation) ClearField(name string) error {
+	switch name {
+	case user.FieldPassword:
+		m.ClearPassword()
+		return nil
+	case user.FieldPasswordSalt:
+		m.ClearPasswordSalt()
+		return nil
+	}
 	return fmt.Errorf("unknown User nullable field %s", name)
 }
 

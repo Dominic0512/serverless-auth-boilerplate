@@ -21,8 +21,8 @@ func (User) Fields() []ent.Field {
 		field.Enum("role").NamedValues("User", "USER", "Admin", "ADMIN").Default("USER"),
 		field.String("name").NotEmpty(),
 		field.String("email").Unique(),
-		field.String("password").Nillable(),
-		field.String("passwordSalt").Nillable(),
+		field.String("password").Optional().Nillable(),
+		field.String("passwordSalt").Optional().Nillable(),
 		field.Time("createdAt").Default(time.Now),
 	}
 }

@@ -98,6 +98,12 @@ func (uu *UserUpdate) SetNillablePassword(s *string) *UserUpdate {
 	return uu
 }
 
+// ClearPassword clears the value of the "password" field.
+func (uu *UserUpdate) ClearPassword() *UserUpdate {
+	uu.mutation.ClearPassword()
+	return uu
+}
+
 // SetPasswordSalt sets the "passwordSalt" field.
 func (uu *UserUpdate) SetPasswordSalt(s string) *UserUpdate {
 	uu.mutation.SetPasswordSalt(s)
@@ -109,6 +115,12 @@ func (uu *UserUpdate) SetNillablePasswordSalt(s *string) *UserUpdate {
 	if s != nil {
 		uu.SetPasswordSalt(*s)
 	}
+	return uu
+}
+
+// ClearPasswordSalt clears the value of the "passwordSalt" field.
+func (uu *UserUpdate) ClearPasswordSalt() *UserUpdate {
+	uu.mutation.ClearPasswordSalt()
 	return uu
 }
 
@@ -205,8 +217,14 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := uu.mutation.Password(); ok {
 		_spec.SetField(user.FieldPassword, field.TypeString, value)
 	}
+	if uu.mutation.PasswordCleared() {
+		_spec.ClearField(user.FieldPassword, field.TypeString)
+	}
 	if value, ok := uu.mutation.PasswordSalt(); ok {
 		_spec.SetField(user.FieldPasswordSalt, field.TypeString, value)
+	}
+	if uu.mutation.PasswordSaltCleared() {
+		_spec.ClearField(user.FieldPasswordSalt, field.TypeString)
 	}
 	if value, ok := uu.mutation.CreatedAt(); ok {
 		_spec.SetField(user.FieldCreatedAt, field.TypeTime, value)
@@ -301,6 +319,12 @@ func (uuo *UserUpdateOne) SetNillablePassword(s *string) *UserUpdateOne {
 	return uuo
 }
 
+// ClearPassword clears the value of the "password" field.
+func (uuo *UserUpdateOne) ClearPassword() *UserUpdateOne {
+	uuo.mutation.ClearPassword()
+	return uuo
+}
+
 // SetPasswordSalt sets the "passwordSalt" field.
 func (uuo *UserUpdateOne) SetPasswordSalt(s string) *UserUpdateOne {
 	uuo.mutation.SetPasswordSalt(s)
@@ -312,6 +336,12 @@ func (uuo *UserUpdateOne) SetNillablePasswordSalt(s *string) *UserUpdateOne {
 	if s != nil {
 		uuo.SetPasswordSalt(*s)
 	}
+	return uuo
+}
+
+// ClearPasswordSalt clears the value of the "passwordSalt" field.
+func (uuo *UserUpdateOne) ClearPasswordSalt() *UserUpdateOne {
+	uuo.mutation.ClearPasswordSalt()
 	return uuo
 }
 
@@ -438,8 +468,14 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	if value, ok := uuo.mutation.Password(); ok {
 		_spec.SetField(user.FieldPassword, field.TypeString, value)
 	}
+	if uuo.mutation.PasswordCleared() {
+		_spec.ClearField(user.FieldPassword, field.TypeString)
+	}
 	if value, ok := uuo.mutation.PasswordSalt(); ok {
 		_spec.SetField(user.FieldPasswordSalt, field.TypeString, value)
+	}
+	if uuo.mutation.PasswordSaltCleared() {
+		_spec.ClearField(user.FieldPasswordSalt, field.TypeString)
 	}
 	if value, ok := uuo.mutation.CreatedAt(); ok {
 		_spec.SetField(user.FieldCreatedAt, field.TypeTime, value)
