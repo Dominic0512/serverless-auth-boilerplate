@@ -26,12 +26,12 @@ func NewDatabase(config *config.Config) (*Database, error) {
 
 	client, err := ent.Open(driver, dataSource)
 	if err != nil {
-		log.Fatal("The ent open database connection error.")
+		log.Fatalf("The ent open database connection error : %s", err)
 		return nil, err
 	}
 
 	if err := client.Schema.Create(context.Background()); err != nil {
-		log.Fatal("The ent background auto-migration error.")
+		log.Fatalf("The ent background auto-migration error : %s", err)
 		return nil, err
 	}
 

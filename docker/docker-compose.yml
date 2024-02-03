@@ -1,0 +1,27 @@
+version: '3.8'
+name: api-services
+services:
+  auth:
+    container_name: auth-serivce
+    build:
+      context: ..
+      dockerfile: ./docker/Dockerfile.api
+    ports:
+      - 10001:8080
+    volumes:
+      - ../backend:/app
+      - ../backend/cmd/auth/gin/.env:/app/.env
+    environment:
+      - PROJECT_DIR=./cmd/auth/gin
+  user:
+    container_name: user-serivce
+    build:
+      context: ..
+      dockerfile: ./docker/Dockerfile.api
+    ports:
+      - 10002:8080
+    volumes:
+      - ../backend:/app
+      - ../backend/cmd/user/gin/.env:/app/.env
+    environment:
+      - PROJECT_DIR=./cmd/user/gin
