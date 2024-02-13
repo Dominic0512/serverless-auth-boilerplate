@@ -4,16 +4,15 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Dominic0512/serverless-auth-boilerplate/model"
-	"github.com/Dominic0512/serverless-auth-boilerplate/repository"
+	"github.com/Dominic0512/serverless-auth-boilerplate/domain"
 	"github.com/google/uuid"
 )
 
 type UserService struct {
-	repo repository.UserRepository
+	repo domain.UserRepository
 }
 
-func (us UserService) Find() ([]*model.UserEntity, error) {
+func (us UserService) Find() ([]*domain.UserEntity, error) {
 	users, err := us.repo.Find()
 	if err != nil {
 		return nil, fmt.Errorf("failed to find users: %w", err)
@@ -21,7 +20,7 @@ func (us UserService) Find() ([]*model.UserEntity, error) {
 	return users, nil
 }
 
-func (us UserService) FindByID(id string) (*model.UserEntity, error) {
+func (us UserService) FindByID(id string) (*domain.UserEntity, error) {
 	uuid, err := uuid.Parse(id)
 	if err != nil {
 		return nil, fmt.Errorf("invalid id type: %w", err)
@@ -34,9 +33,9 @@ func (us UserService) FindByID(id string) (*model.UserEntity, error) {
 	return user, nil
 }
 
-func (us UserService) Create(input model.CreateUserInput) (*model.UserEntity, error) {
+func (us UserService) Create(input domain.CreateUserInput) (*domain.UserEntity, error) {
 	salt := "test"
-	userProps := model.UserEntity{
+	userProps := domain.UserEntity{
 		Name:         strings.Split(input.Email, "@")[0],
 		Email:        input.Email,
 		Password:     &input.Password,
@@ -51,8 +50,8 @@ func (us UserService) Create(input model.CreateUserInput) (*model.UserEntity, er
 	return user, nil
 }
 
-func (us UserService) CreateWithoutPassword(input model.CreateUserWithoutPasswordInput) (*model.UserEntity, error) {
-	userProps := model.UserEntity{
+func (us UserService) CreateWithoutPassword(input domain.CreateUserWithoutPasswordInput) (*domain.UserEntity, error) {
+	userProps := domain.UserEntity{
 		Name:  strings.Split(input.Email, "@")[0],
 		Email: input.Email,
 	}
@@ -66,13 +65,13 @@ func (us UserService) CreateWithoutPassword(input model.CreateUserWithoutPasswor
 	return user, nil
 }
 
-func (us UserService) Update(input model.UpdateUserInput) (*model.UserEntity, error) {
+func (us UserService) Update(input domain.UpdateUserInput) (*domain.UserEntity, error) {
 	uuid, err := uuid.Parse(input.ID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid id type: %w", err)
 	}
 
-	user, err := us.repo.Update(uuid, model.UserEntity{
+	user, err := us.repo.Update(uuid, domain.UserEntity{
 		Name: input.Name,
 	})
 	if err != nil {
@@ -82,7 +81,7 @@ func (us UserService) Update(input model.UpdateUserInput) (*model.UserEntity, er
 	return user, nil
 }
 
-func (us UserService) Delete(input model.MaunipulateUserInput) error {
+func (us UserService) Delete(input domain.MaunipulateUserInput) error {
 	uuid, err := uuid.Parse(input.ID)
 	if err != nil {
 		return fmt.Errorf("invalid id type: %w", err)
@@ -96,6 +95,6 @@ func (us UserService) Delete(input model.MaunipulateUserInput) error {
 	return nil
 }
 
-func NewUserService(repo repository.UserRepository) UserService {
+func NewUserService(repo domain.UserRepository) UserService {
 	return UserService{repo}
 }

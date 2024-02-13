@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/Dominic0512/serverless-auth-boilerplate/controller/request"
-	"github.com/Dominic0512/serverless-auth-boilerplate/model"
+	"github.com/Dominic0512/serverless-auth-boilerplate/domain"
 	"github.com/Dominic0512/serverless-auth-boilerplate/pkg/validate"
 	"github.com/Dominic0512/serverless-auth-boilerplate/service"
 	"github.com/gin-gonic/gin"
@@ -42,7 +42,7 @@ func (ac AuthController) SignUp(c *gin.Context) {
 		return
 	}
 
-	user := model.CreateUserInput{
+	user := domain.CreateUserInput{
 		Email:    request.Email,
 		Password: request.Password,
 	}

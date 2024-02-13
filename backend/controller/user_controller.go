@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/Dominic0512/serverless-auth-boilerplate/controller/request"
-	"github.com/Dominic0512/serverless-auth-boilerplate/model"
+	"github.com/Dominic0512/serverless-auth-boilerplate/domain"
 	"github.com/Dominic0512/serverless-auth-boilerplate/pkg/validate"
 	"github.com/Dominic0512/serverless-auth-boilerplate/service"
 	"github.com/gin-gonic/gin"
@@ -51,7 +51,7 @@ func (uc UserController) Create(c *gin.Context) {
 		return
 	}
 
-	input := model.CreateUserWithoutPasswordInput{
+	input := domain.CreateUserWithoutPasswordInput{
 		Email: request.Email,
 	}
 
@@ -119,7 +119,7 @@ func (uc UserController) Update(c *gin.Context) {
 		return
 	}
 
-	input := model.UpdateUserInput{
+	input := domain.UpdateUserInput{
 		ID:   uri.ID,
 		Name: request.Name,
 	}
@@ -158,7 +158,7 @@ func (uc UserController) PartialUpdate(c *gin.Context) {
 		return
 	}
 
-	input := model.UpdateUserInput{
+	input := domain.UpdateUserInput{
 		ID:   uri.ID,
 		Name: request.Name,
 	}
@@ -186,7 +186,7 @@ func (uc UserController) Delete(c *gin.Context) {
 		return
 	}
 
-	input := model.MaunipulateUserInput{
+	input := domain.MaunipulateUserInput{
 		ID: uri.ID,
 	}
 

@@ -1,4 +1,4 @@
-package model
+package domain
 
 import (
 	"github.com/Dominic0512/serverless-auth-boilerplate/ent"
@@ -31,10 +31,10 @@ type UpdateUserInput struct {
 	Name string
 }
 
-type UserRepositoryInterface interface {
-	Find(name string) ([]*UserEntity, error)
+type UserRepository interface {
+	Find() ([]*UserEntity, error)
 	FindOne(id uuid.UUID) (*UserEntity, error)
 	Create(user UserEntity) (*UserEntity, error)
 	Update(id uuid.UUID, properties UserEntity) (*UserEntity, error)
-	Delete(id uuid.UUID) (*UserEntity, error)
+	Delete(id uuid.UUID) error
 }

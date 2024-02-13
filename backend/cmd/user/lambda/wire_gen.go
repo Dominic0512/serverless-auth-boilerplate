@@ -7,7 +7,7 @@
 package main
 
 import (
-	"github.com/Dominic0512/serverless-auth-boilerplate/cmd/user/app"
+	"github.com/Dominic0512/serverless-auth-boilerplate/cmd/user/lambda/app"
 	"github.com/Dominic0512/serverless-auth-boilerplate/cmd/user/router"
 	"github.com/Dominic0512/serverless-auth-boilerplate/controller"
 	"github.com/Dominic0512/serverless-auth-boilerplate/infra/config"
