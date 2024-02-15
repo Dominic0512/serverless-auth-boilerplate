@@ -89,7 +89,7 @@ func (uc UserController) GetById(c *gin.Context) {
 	user, err := uc.us.FindByID(uri.ID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Create user failed.",
+			"message": "Find user failed.",
 		})
 		return
 	}
