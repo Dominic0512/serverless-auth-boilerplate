@@ -39,7 +39,6 @@ type UserMutation struct {
 	name          *string
 	email         *string
 	password      *string
-	passwordSalt  *string
 	createdAt     *time.Time
 	clearedFields map[string]struct{}
 	done          bool
@@ -344,55 +343,6 @@ func (m *UserMutation) ResetPassword() {
 	delete(m.clearedFields, user.FieldPassword)
 }
 
-// SetPasswordSalt sets the "passwordSalt" field.
-func (m *UserMutation) SetPasswordSalt(s string) {
-	m.passwordSalt = &s
-}
-
-// PasswordSalt returns the value of the "passwordSalt" field in the mutation.
-func (m *UserMutation) PasswordSalt() (r string, exists bool) {
-	v := m.passwordSalt
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldPasswordSalt returns the old "passwordSalt" field's value of the User entity.
-// If the User object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldPasswordSalt(ctx context.Context) (v *string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldPasswordSalt is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldPasswordSalt requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldPasswordSalt: %w", err)
-	}
-	return oldValue.PasswordSalt, nil
-}
-
-// ClearPasswordSalt clears the value of the "passwordSalt" field.
-func (m *UserMutation) ClearPasswordSalt() {
-	m.passwordSalt = nil
-	m.clearedFields[user.FieldPasswordSalt] = struct{}{}
-}
-
-// PasswordSaltCleared returns if the "passwordSalt" field was cleared in this mutation.
-func (m *UserMutation) PasswordSaltCleared() bool {
-	_, ok := m.clearedFields[user.FieldPasswordSalt]
-	return ok
-}
-
-// ResetPasswordSalt resets all changes to the "passwordSalt" field.
-func (m *UserMutation) ResetPasswordSalt() {
-	m.passwordSalt = nil
-	delete(m.clearedFields, user.FieldPasswordSalt)
-}
-
 // SetCreatedAt sets the "createdAt" field.
 func (m *UserMutation) SetCreatedAt(t time.Time) {
 	m.createdAt = &t
@@ -463,7 +413,7 @@ func (m *UserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 6)
 	if m.state != nil {
 		fields = append(fields, user.FieldState)
 	}
@@ -478,9 +428,6 @@ func (m *UserMutation) Fields() []string {
 	}
 	if m.password != nil {
 		fields = append(fields, user.FieldPassword)
-	}
-	if m.passwordSalt != nil {
-		fields = append(fields, user.FieldPasswordSalt)
 	}
 	if m.createdAt != nil {
 		fields = append(fields, user.FieldCreatedAt)
@@ -503,8 +450,6 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 		return m.Email()
 	case user.FieldPassword:
 		return m.Password()
-	case user.FieldPasswordSalt:
-		return m.PasswordSalt()
 	case user.FieldCreatedAt:
 		return m.CreatedAt()
 	}
@@ -526,8 +471,6 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldEmail(ctx)
 	case user.FieldPassword:
 		return m.OldPassword(ctx)
-	case user.FieldPasswordSalt:
-		return m.OldPasswordSalt(ctx)
 	case user.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	}
@@ -574,13 +517,6 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetPassword(v)
 		return nil
-	case user.FieldPasswordSalt:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetPasswordSalt(v)
-		return nil
 	case user.FieldCreatedAt:
 		v, ok := value.(time.Time)
 		if !ok {
@@ -621,9 +557,6 @@ func (m *UserMutation) ClearedFields() []string {
 	if m.FieldCleared(user.FieldPassword) {
 		fields = append(fields, user.FieldPassword)
 	}
-	if m.FieldCleared(user.FieldPasswordSalt) {
-		fields = append(fields, user.FieldPasswordSalt)
-	}
 	return fields
 }
 
@@ -640,9 +573,6 @@ func (m *UserMutation) ClearField(name string) error {
 	switch name {
 	case user.FieldPassword:
 		m.ClearPassword()
-		return nil
-	case user.FieldPasswordSalt:
-		m.ClearPasswordSalt()
 		return nil
 	}
 	return fmt.Errorf("unknown User nullable field %s", name)
@@ -666,9 +596,6 @@ func (m *UserMutation) ResetField(name string) error {
 		return nil
 	case user.FieldPassword:
 		m.ResetPassword()
-		return nil
-	case user.FieldPasswordSalt:
-		m.ResetPasswordSalt()
 		return nil
 	case user.FieldCreatedAt:
 		m.ResetCreatedAt()

@@ -22,7 +22,6 @@ func (User) Fields() []ent.Field {
 		field.String("name").NotEmpty(),
 		field.String("email").Unique(),
 		field.String("password").Optional().Nillable(),
-		field.String("passwordSalt").Optional().Nillable(),
 		field.Time("createdAt").Default(time.Now),
 	}
 }

@@ -37,8 +37,7 @@ func (ur UserRepository) Create(user domain.UserEntity) (*domain.UserEntity, err
 		SetName(user.Name)
 
 	if user.Password != nil {
-		mutate.SetPassword(*user.Password).
-			SetPasswordSalt(*user.PasswordSalt)
+		mutate.SetPassword(*user.Password)
 	}
 
 	u, err := mutate.Save(context.Background())

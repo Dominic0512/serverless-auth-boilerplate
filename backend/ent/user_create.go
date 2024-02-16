@@ -75,20 +75,6 @@ func (uc *UserCreate) SetNillablePassword(s *string) *UserCreate {
 	return uc
 }
 
-// SetPasswordSalt sets the "passwordSalt" field.
-func (uc *UserCreate) SetPasswordSalt(s string) *UserCreate {
-	uc.mutation.SetPasswordSalt(s)
-	return uc
-}
-
-// SetNillablePasswordSalt sets the "passwordSalt" field if the given value is not nil.
-func (uc *UserCreate) SetNillablePasswordSalt(s *string) *UserCreate {
-	if s != nil {
-		uc.SetPasswordSalt(*s)
-	}
-	return uc
-}
-
 // SetCreatedAt sets the "createdAt" field.
 func (uc *UserCreate) SetCreatedAt(t time.Time) *UserCreate {
 	uc.mutation.SetCreatedAt(t)
@@ -256,10 +242,6 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.Password(); ok {
 		_spec.SetField(user.FieldPassword, field.TypeString, value)
 		_node.Password = &value
-	}
-	if value, ok := uc.mutation.PasswordSalt(); ok {
-		_spec.SetField(user.FieldPasswordSalt, field.TypeString, value)
-		_node.PasswordSalt = &value
 	}
 	if value, ok := uc.mutation.CreatedAt(); ok {
 		_spec.SetField(user.FieldCreatedAt, field.TypeTime, value)

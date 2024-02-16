@@ -5,11 +5,13 @@ import (
 	"strings"
 
 	"github.com/Dominic0512/serverless-auth-boilerplate/domain"
+	"github.com/Dominic0512/serverless-auth-boilerplate/pkg/helper"
 	"github.com/google/uuid"
 )
 
 type UserService struct {
 	repo domain.UserRepository
+	pwh  helper.PasswordHelper
 }
 
 func (us UserService) Find() ([]*domain.UserEntity, error) {
@@ -34,12 +36,15 @@ func (us UserService) FindByID(id string) (*domain.UserEntity, error) {
 }
 
 func (us UserService) Create(input domain.CreateUserInput) (*domain.UserEntity, error) {
-	salt := "test"
+	hashedPassword, err := us.pwh.Hash(input.Password)
+	if err != nil {
+		return nil, fmt.Errorf("failed to hash the password: %w", err)
+	}
+
 	userProps := domain.UserEntity{
-		Name:         strings.Split(input.Email, "@")[0],
-		Email:        input.Email,
-		Password:     &input.Password,
-		PasswordSalt: &salt,
+		Name:     strings.Split(input.Email, "@")[0],
+		Email:    input.Email,
+		Password: &hashedPassword,
 	}
 
 	user, err := us.repo.Create(userProps)
@@ -95,6 +100,6 @@ func (us UserService) Delete(input domain.MaunipulateUserInput) error {
 	return nil
 }
 
-func NewUserService(repo domain.UserRepository) UserService {
-	return UserService{repo}
+func NewUserService(repo domain.UserRepository, pwh helper.PasswordHelper) UserService {
+	return UserService{repo, pwh}
 }

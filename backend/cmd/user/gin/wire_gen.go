@@ -14,6 +14,7 @@ import (
 	"github.com/Dominic0512/serverless-auth-boilerplate/infra/database"
 	"github.com/Dominic0512/serverless-auth-boilerplate/infra/framework"
 	"github.com/Dominic0512/serverless-auth-boilerplate/infra/runner"
+	"github.com/Dominic0512/serverless-auth-boilerplate/pkg/helper"
 	"github.com/Dominic0512/serverless-auth-boilerplate/pkg/validate"
 	"github.com/Dominic0512/serverless-auth-boilerplate/repository"
 	"github.com/Dominic0512/serverless-auth-boilerplate/route"
@@ -38,7 +39,8 @@ func InitializeApp() (*app.App, error) {
 		return nil, err
 	}
 	userRepository := repository.NewUserRepository(databaseDatabase)
-	userService := service.NewUserService(userRepository)
+	bcryptPasswordHelper := helper.NewBcryptPasswordHelper()
+	userService := service.NewUserService(userRepository, bcryptPasswordHelper)
 	validator := validate.NewValidator()
 	userController := controller.NewUserController(userService, validator)
 	userRoute := route.NewUserRoute(engine, userController)
