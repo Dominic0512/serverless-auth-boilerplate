@@ -8,13 +8,17 @@ import (
 )
 
 type Config struct {
-	Environment string `mapstructure:"ENV"`
-	DBDriver    string `mapstructure:"DB_DRIVER"`
-	DBUsername  string `mapstructure:"DB_USER"`
-	DBPassword  string `mapstructure:"DB_PASS"`
-	DBHost      string `mapstructure:"DB_HOST"`
-	DBPort      string `mapstructure:"DB_PORT"`
-	DBName      string `mapstructure:"DB_NAME"`
+	Environment       string `mapstructure:"ENV"`
+	DBDriver          string `mapstructure:"DB_DRIVER"`
+	DBUsername        string `mapstructure:"DB_USER"`
+	DBPassword        string `mapstructure:"DB_PASS"`
+	DBHost            string `mapstructure:"DB_HOST"`
+	DBPort            string `mapstructure:"DB_PORT"`
+	DBName            string `mapstructure:"DB_NAME"`
+	Auth0Domain       string `mapstructure:"AUTH0_DOMAIN"`
+	Auth0ClientID     string `mapstructure:"AUTH0_CLIENT_ID"`
+	Auth0ClientSecret string `mapstructure:"AUTH0_CLIENT_SECRET"`
+	Auth0CallbackURL  string `mapstructure:"AUTH0_CALLBACK_URL"`
 }
 
 func NewConfig() (*Config, error) {

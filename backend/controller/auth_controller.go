@@ -11,12 +11,23 @@ import (
 )
 
 type AuthController struct {
-	us service.UserService
 	v  *validate.Validator
+	as service.AuthService
+	us service.UserService
 }
 
-func NewAuthController(us service.UserService, v *validate.Validator) AuthController {
-	return AuthController{us, v}
+func NewAuthController(
+	v *validate.Validator,
+	as service.AuthService,
+	us service.UserService,
+) AuthController {
+	return AuthController{v, as, us}
+}
+
+func (ac AuthController) GenerateAuthURL(c *gin.Context) {
+	c.JSON(200, gin.H{
+		"url": ac.as.GenerateAuthURL(),
+	})
 }
 
 func (ac AuthController) SignIn(c *gin.Context) {
@@ -42,12 +53,11 @@ func (ac AuthController) SignUp(c *gin.Context) {
 		return
 	}
 
-	user := domain.CreateUserInput{
-		Email:    request.Email,
-		Password: request.Password,
+	input := domain.OAuthSignUpInput{
+		Code: request.Code,
 	}
 
-	u, err := ac.us.Create(user)
+	token, err := ac.as.SignUp(input)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Create user failed.",
@@ -56,7 +66,6 @@ func (ac AuthController) SignUp(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusAccepted, gin.H{
-		"message": "Sign-up successfully",
-		"user":    u,
+		"token": token,
 	})
 }

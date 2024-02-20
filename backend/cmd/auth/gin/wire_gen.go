@@ -10,10 +10,12 @@ import (
 	"github.com/Dominic0512/serverless-auth-boilerplate/cmd/auth/gin/app"
 	"github.com/Dominic0512/serverless-auth-boilerplate/cmd/auth/router"
 	"github.com/Dominic0512/serverless-auth-boilerplate/controller"
+	"github.com/Dominic0512/serverless-auth-boilerplate/infra/authenticator"
 	"github.com/Dominic0512/serverless-auth-boilerplate/infra/config"
 	"github.com/Dominic0512/serverless-auth-boilerplate/infra/database"
 	"github.com/Dominic0512/serverless-auth-boilerplate/infra/framework"
 	"github.com/Dominic0512/serverless-auth-boilerplate/infra/runner"
+	"github.com/Dominic0512/serverless-auth-boilerplate/pkg/helper"
 	"github.com/Dominic0512/serverless-auth-boilerplate/pkg/validate"
 	"github.com/Dominic0512/serverless-auth-boilerplate/repository"
 	"github.com/Dominic0512/serverless-auth-boilerplate/route"
@@ -29,6 +31,7 @@ import (
 func InitializeApp() (*app.App, error) {
 	engine := framework.NewGinFramework()
 	baseRoute := route.NewBaseRoute(engine)
+	validator := validate.NewValidator()
 	configConfig, err := config.NewConfig()
 	if err != nil {
 		return nil, err
@@ -38,9 +41,14 @@ func InitializeApp() (*app.App, error) {
 		return nil, err
 	}
 	userRepository := repository.NewUserRepository(databaseDatabase)
-	userService := service.NewUserService(userRepository)
-	validator := validate.NewValidator()
-	authController := controller.NewAuthController(userService, validator)
+	auth0Authenticator, err := authenticator.NewAuth0Authenticator(configConfig)
+	if err != nil {
+		return nil, err
+	}
+	authService := service.NewAuthService(userRepository, auth0Authenticator)
+	bcryptPasswordHelper := helper.NewBcryptPasswordHelper()
+	userService := service.NewUserService(userRepository, bcryptPasswordHelper)
+	authController := controller.NewAuthController(validator, authService, userService)
 	authRoute := route.NewAuthRoute(engine, authController)
 	routes := router.NewRouter(baseRoute, authRoute)
 	ginRunner := runner.NewGinRunner(engine)
