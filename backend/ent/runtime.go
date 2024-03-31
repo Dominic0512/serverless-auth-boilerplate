@@ -7,6 +7,7 @@ import (
 
 	"github.com/Dominic0512/serverless-auth-boilerplate/ent/schema"
 	"github.com/Dominic0512/serverless-auth-boilerplate/ent/user"
+	"github.com/Dominic0512/serverless-auth-boilerplate/ent/userprovider"
 	"github.com/google/uuid"
 )
 
@@ -28,4 +29,16 @@ func init() {
 	userDescID := userFields[0].Descriptor()
 	// user.DefaultID holds the default value on creation for the id field.
 	user.DefaultID = userDescID.Default.(func() uuid.UUID)
+	userproviderFields := schema.UserProvider{}.Fields()
+	_ = userproviderFields
+	// userproviderDescCreatedAt is the schema descriptor for createdAt field.
+	userproviderDescCreatedAt := userproviderFields[3].Descriptor()
+	// userprovider.DefaultCreatedAt holds the default value on creation for the createdAt field.
+	userprovider.DefaultCreatedAt = userproviderDescCreatedAt.Default.(func() time.Time)
+	// userproviderDescUpdatedAt is the schema descriptor for updatedAt field.
+	userproviderDescUpdatedAt := userproviderFields[4].Descriptor()
+	// userprovider.DefaultUpdatedAt holds the default value on creation for the updatedAt field.
+	userprovider.DefaultUpdatedAt = userproviderDescUpdatedAt.Default.(func() time.Time)
+	// userprovider.UpdateDefaultUpdatedAt holds the default value on update for the updatedAt field.
+	userprovider.UpdateDefaultUpdatedAt = userproviderDescUpdatedAt.UpdateDefault.(func() time.Time)
 }

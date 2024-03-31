@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/Dominic0512/serverless-auth-boilerplate/ent/predicate"
 	"github.com/google/uuid"
 )
@@ -358,6 +359,29 @@ func CreatedAtLT(v time.Time) predicate.User {
 // CreatedAtLTE applies the LTE predicate on the "createdAt" field.
 func CreatedAtLTE(v time.Time) predicate.User {
 	return predicate.User(sql.FieldLTE(FieldCreatedAt, v))
+}
+
+// HasUserProviders applies the HasEdge predicate on the "user_providers" edge.
+func HasUserProviders() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, UserProvidersTable, UserProvidersColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasUserProvidersWith applies the HasEdge predicate on the "user_providers" edge with a given conditions (other predicates).
+func HasUserProvidersWith(preds ...predicate.UserProvider) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := newUserProvidersStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

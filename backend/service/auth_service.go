@@ -9,8 +9,9 @@ import (
 )
 
 type AuthService struct {
-	repo domain.UserRepository
-	auth authenticator.Authenticator
+	userRepo         domain.UserRepository
+	userProviderRepo domain.UserProviderRepository
+	auth             authenticator.Authenticator
 }
 
 func (as AuthService) GenerateAuthURL() string {
@@ -34,10 +35,21 @@ func (as AuthService) SignUp(input domain.OAuthSignUpInput) (string, error) {
 		Email: data.Email,
 	}
 
-	var _ string
-	_, err = as.repo.Create(userProps)
+	u, err := as.userRepo.Create(userProps)
 	if err != nil {
 		log.Printf("Can not create user properly: %v", err)
+		return "", err
+	}
+
+	userProviderProps := domain.UserProviderEntity{
+		Name:   domain.UserProviderNamePrimary,
+		UserID: u.ID,
+	}
+
+	var _ domain.UserProviderEntity
+	_, err = as.userProviderRepo.Create(userProviderProps)
+	if err != nil {
+		log.Printf("Can not create user provider properly: %w", err)
 		return "", err
 	}
 
@@ -47,9 +59,14 @@ func (as AuthService) SignUp(input domain.OAuthSignUpInput) (string, error) {
 func (as AuthService) Login() {
 }
 
-func NewAuthService(repo domain.UserRepository, auth authenticator.Authenticator) AuthService {
+func NewAuthService(
+	userRepo domain.UserRepository,
+	userProviderRepo domain.UserProviderRepository,
+	auth authenticator.Authenticator,
+) AuthService {
 	return AuthService{
-		repo,
+		userRepo,
+		userProviderRepo,
 		auth,
 	}
 }

@@ -41,13 +41,14 @@ func InitializeApp() (*app.App, error) {
 		return nil, err
 	}
 	userRepository := repository.NewUserRepository(databaseDatabase)
+	userProviderRepository := repository.NewUserProviderRepository(databaseDatabase)
 	auth0Authenticator, err := authenticator.NewAuth0Authenticator(configConfig)
 	if err != nil {
 		return nil, err
 	}
-	authService := service.NewAuthService(userRepository, auth0Authenticator)
+	authService := service.NewAuthService(userRepository, userProviderRepository, auth0Authenticator)
 	bcryptPasswordHelper := helper.NewBcryptPasswordHelper()
-	userService := service.NewUserService(userRepository, bcryptPasswordHelper)
+	userService := service.NewUserService(userRepository, userProviderRepository, bcryptPasswordHelper)
 	authController := controller.NewAuthController(validator, authService, userService)
 	authRoute := route.NewAuthRoute(engine, authController)
 	routes := router.NewRouter(baseRoute, authRoute)

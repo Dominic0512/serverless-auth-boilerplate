@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/google/uuid"
 )
 
@@ -27,8 +28,17 @@ const (
 	FieldPassword = "password"
 	// FieldCreatedAt holds the string denoting the createdat field in the database.
 	FieldCreatedAt = "created_at"
+	// EdgeUserProviders holds the string denoting the user_providers edge name in mutations.
+	EdgeUserProviders = "user_providers"
 	// Table holds the table name of the user in the database.
 	Table = "users"
+	// UserProvidersTable is the table that holds the user_providers relation/edge.
+	UserProvidersTable = "user_providers"
+	// UserProvidersInverseTable is the table name for the UserProvider entity.
+	// It exists in this package in order to avoid circular dependency with the "userprovider" package.
+	UserProvidersInverseTable = "user_providers"
+	// UserProvidersColumn is the table column denoting the user_providers relation/edge.
+	UserProvidersColumn = "user_id"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -149,4 +159,25 @@ func ByPassword(opts ...sql.OrderTermOption) OrderOption {
 // ByCreatedAt orders the results by the createdAt field.
 func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
+}
+
+// ByUserProvidersCount orders the results by user_providers count.
+func ByUserProvidersCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newUserProvidersStep(), opts...)
+	}
+}
+
+// ByUserProviders orders the results by user_providers terms.
+func ByUserProviders(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newUserProvidersStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newUserProvidersStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(UserProvidersInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, UserProvidersTable, UserProvidersColumn),
+	)
 }

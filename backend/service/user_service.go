@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/Dominic0512/serverless-auth-boilerplate/domain"
@@ -10,12 +11,13 @@ import (
 )
 
 type UserService struct {
-	repo domain.UserRepository
-	pwh  helper.PasswordHelper
+	userRepo         domain.UserRepository
+	userProviderRepo domain.UserProviderRepository
+	pwh              helper.PasswordHelper
 }
 
 func (us UserService) Find() ([]*domain.UserEntity, error) {
-	users, err := us.repo.Find()
+	users, err := us.userRepo.Find()
 	if err != nil {
 		return nil, fmt.Errorf("failed to find users: %w", err)
 	}
@@ -28,7 +30,7 @@ func (us UserService) FindByID(id string) (*domain.UserEntity, error) {
 		return nil, fmt.Errorf("invalid id type: %w", err)
 	}
 
-	user, err := us.repo.FindOne(uuid)
+	user, err := us.userRepo.FindOne(uuid)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find user by id: %w", err)
 	}
@@ -47,9 +49,21 @@ func (us UserService) Create(input domain.CreateUserInput) (*domain.UserEntity, 
 		Password: &hashedPassword,
 	}
 
-	user, err := us.repo.Create(userProps)
+	user, err := us.userRepo.Create(userProps)
 	if err != nil {
 		return nil, fmt.Errorf("failed mutating user: %w", err)
+	}
+
+	userProviderProps := domain.UserProviderEntity{
+		Name:   domain.UserProviderNamePrimary,
+		UserID: user.ID,
+	}
+
+	var _ domain.UserProviderEntity
+	_, err = us.userProviderRepo.Create(userProviderProps)
+	if err != nil {
+		log.Printf("Can not create user provider properly: %w", err)
+		return nil, err
 	}
 
 	return user, nil
@@ -61,10 +75,22 @@ func (us UserService) CreateWithoutPassword(input domain.CreateUserWithoutPasswo
 		Email: input.Email,
 	}
 
-	user, err := us.repo.Create(userProps)
+	user, err := us.userRepo.Create(userProps)
 	if err != nil {
 		fmt.Println(err)
 		return nil, fmt.Errorf("failed create user without password: %w", err)
+	}
+
+	userProviderProps := domain.UserProviderEntity{
+		Name:   domain.UserProviderNamePrimary,
+		UserID: user.ID,
+	}
+
+	var _ domain.UserProviderEntity
+	_, err = us.userProviderRepo.Create(userProviderProps)
+	if err != nil {
+		log.Printf("Can not create user provider properly: %w", err)
+		return nil, err
 	}
 
 	return user, nil
@@ -76,7 +102,7 @@ func (us UserService) Update(input domain.UpdateUserInput) (*domain.UserEntity, 
 		return nil, fmt.Errorf("invalid id type: %w", err)
 	}
 
-	user, err := us.repo.Update(uuid, domain.UserEntity{
+	user, err := us.userRepo.Update(uuid, domain.UserEntity{
 		Name: input.Name,
 	})
 	if err != nil {
@@ -92,7 +118,7 @@ func (us UserService) Delete(input domain.MaunipulateUserInput) error {
 		return fmt.Errorf("invalid id type: %w", err)
 	}
 
-	err = us.repo.Delete(uuid)
+	err = us.userRepo.Delete(uuid)
 	if err != nil {
 		return fmt.Errorf("failed to delete user by id: %w", err)
 	}
@@ -100,6 +126,10 @@ func (us UserService) Delete(input domain.MaunipulateUserInput) error {
 	return nil
 }
 
-func NewUserService(repo domain.UserRepository, pwh helper.PasswordHelper) UserService {
-	return UserService{repo, pwh}
+func NewUserService(
+	userRepo domain.UserRepository,
+	userProviderRepo domain.UserProviderRepository,
+	pwh helper.PasswordHelper,
+) UserService {
+	return UserService{userRepo, userProviderRepo, pwh}
 }

@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/Dominic0512/serverless-auth-boilerplate/ent/predicate"
 	"github.com/Dominic0512/serverless-auth-boilerplate/ent/user"
+	"github.com/Dominic0512/serverless-auth-boilerplate/ent/userprovider"
 )
 
 // UserUpdate is the builder for updating User entities.
@@ -118,9 +119,45 @@ func (uu *UserUpdate) SetNillableCreatedAt(t *time.Time) *UserUpdate {
 	return uu
 }
 
+// AddUserProviderIDs adds the "user_providers" edge to the UserProvider entity by IDs.
+func (uu *UserUpdate) AddUserProviderIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddUserProviderIDs(ids...)
+	return uu
+}
+
+// AddUserProviders adds the "user_providers" edges to the UserProvider entity.
+func (uu *UserUpdate) AddUserProviders(u ...*UserProvider) *UserUpdate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uu.AddUserProviderIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
+}
+
+// ClearUserProviders clears all "user_providers" edges to the UserProvider entity.
+func (uu *UserUpdate) ClearUserProviders() *UserUpdate {
+	uu.mutation.ClearUserProviders()
+	return uu
+}
+
+// RemoveUserProviderIDs removes the "user_providers" edge to UserProvider entities by IDs.
+func (uu *UserUpdate) RemoveUserProviderIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveUserProviderIDs(ids...)
+	return uu
+}
+
+// RemoveUserProviders removes "user_providers" edges to UserProvider entities.
+func (uu *UserUpdate) RemoveUserProviders(u ...*UserProvider) *UserUpdate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uu.RemoveUserProviderIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -202,6 +239,51 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := uu.mutation.CreatedAt(); ok {
 		_spec.SetField(user.FieldCreatedAt, field.TypeTime, value)
+	}
+	if uu.mutation.UserProvidersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserProvidersTable,
+			Columns: []string{user.UserProvidersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(userprovider.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedUserProvidersIDs(); len(nodes) > 0 && !uu.mutation.UserProvidersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserProvidersTable,
+			Columns: []string{user.UserProvidersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(userprovider.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.UserProvidersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserProvidersTable,
+			Columns: []string{user.UserProvidersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(userprovider.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -313,9 +395,45 @@ func (uuo *UserUpdateOne) SetNillableCreatedAt(t *time.Time) *UserUpdateOne {
 	return uuo
 }
 
+// AddUserProviderIDs adds the "user_providers" edge to the UserProvider entity by IDs.
+func (uuo *UserUpdateOne) AddUserProviderIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddUserProviderIDs(ids...)
+	return uuo
+}
+
+// AddUserProviders adds the "user_providers" edges to the UserProvider entity.
+func (uuo *UserUpdateOne) AddUserProviders(u ...*UserProvider) *UserUpdateOne {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uuo.AddUserProviderIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
+}
+
+// ClearUserProviders clears all "user_providers" edges to the UserProvider entity.
+func (uuo *UserUpdateOne) ClearUserProviders() *UserUpdateOne {
+	uuo.mutation.ClearUserProviders()
+	return uuo
+}
+
+// RemoveUserProviderIDs removes the "user_providers" edge to UserProvider entities by IDs.
+func (uuo *UserUpdateOne) RemoveUserProviderIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveUserProviderIDs(ids...)
+	return uuo
+}
+
+// RemoveUserProviders removes "user_providers" edges to UserProvider entities.
+func (uuo *UserUpdateOne) RemoveUserProviders(u ...*UserProvider) *UserUpdateOne {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uuo.RemoveUserProviderIDs(ids...)
 }
 
 // Where appends a list predicates to the UserUpdate builder.
@@ -427,6 +545,51 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	}
 	if value, ok := uuo.mutation.CreatedAt(); ok {
 		_spec.SetField(user.FieldCreatedAt, field.TypeTime, value)
+	}
+	if uuo.mutation.UserProvidersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserProvidersTable,
+			Columns: []string{user.UserProvidersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(userprovider.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedUserProvidersIDs(); len(nodes) > 0 && !uuo.mutation.UserProvidersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserProvidersTable,
+			Columns: []string{user.UserProvidersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(userprovider.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.UserProvidersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserProvidersTable,
+			Columns: []string{user.UserProvidersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(userprovider.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &User{config: uuo.config}
 	_spec.Assign = _node.assignValues

@@ -15,7 +15,9 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/Dominic0512/serverless-auth-boilerplate/ent/user"
+	"github.com/Dominic0512/serverless-auth-boilerplate/ent/userprovider"
 )
 
 // Client is the client that holds all ent builders.
@@ -25,6 +27,8 @@ type Client struct {
 	Schema *migrate.Schema
 	// User is the client for interacting with the User builders.
 	User *UserClient
+	// UserProvider is the client for interacting with the UserProvider builders.
+	UserProvider *UserProviderClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -37,6 +41,7 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.User = NewUserClient(c.config)
+	c.UserProvider = NewUserProviderClient(c.config)
 }
 
 type (
@@ -127,9 +132,10 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		User:   NewUserClient(cfg),
+		ctx:          ctx,
+		config:       cfg,
+		User:         NewUserClient(cfg),
+		UserProvider: NewUserProviderClient(cfg),
 	}, nil
 }
 
@@ -147,9 +153,10 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		User:   NewUserClient(cfg),
+		ctx:          ctx,
+		config:       cfg,
+		User:         NewUserClient(cfg),
+		UserProvider: NewUserProviderClient(cfg),
 	}, nil
 }
 
@@ -179,12 +186,14 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	c.User.Use(hooks...)
+	c.UserProvider.Use(hooks...)
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	c.User.Intercept(interceptors...)
+	c.UserProvider.Intercept(interceptors...)
 }
 
 // Mutate implements the ent.Mutator interface.
@@ -192,6 +201,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *UserMutation:
 		return c.User.mutate(ctx, m)
+	case *UserProviderMutation:
+		return c.UserProvider.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
 	}
@@ -305,6 +316,22 @@ func (c *UserClient) GetX(ctx context.Context, id uuid.UUID) *User {
 	return obj
 }
 
+// QueryUserProviders queries the user_providers edge of a User.
+func (c *UserClient) QueryUserProviders(u *User) *UserProviderQuery {
+	query := (&UserProviderClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(userprovider.Table, userprovider.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.UserProvidersTable, user.UserProvidersColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *UserClient) Hooks() []Hook {
 	return c.hooks.User
@@ -330,12 +357,161 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 	}
 }
 
+// UserProviderClient is a client for the UserProvider schema.
+type UserProviderClient struct {
+	config
+}
+
+// NewUserProviderClient returns a client for the UserProvider from the given config.
+func NewUserProviderClient(c config) *UserProviderClient {
+	return &UserProviderClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `userprovider.Hooks(f(g(h())))`.
+func (c *UserProviderClient) Use(hooks ...Hook) {
+	c.hooks.UserProvider = append(c.hooks.UserProvider, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `userprovider.Intercept(f(g(h())))`.
+func (c *UserProviderClient) Intercept(interceptors ...Interceptor) {
+	c.inters.UserProvider = append(c.inters.UserProvider, interceptors...)
+}
+
+// Create returns a builder for creating a UserProvider entity.
+func (c *UserProviderClient) Create() *UserProviderCreate {
+	mutation := newUserProviderMutation(c.config, OpCreate)
+	return &UserProviderCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of UserProvider entities.
+func (c *UserProviderClient) CreateBulk(builders ...*UserProviderCreate) *UserProviderCreateBulk {
+	return &UserProviderCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *UserProviderClient) MapCreateBulk(slice any, setFunc func(*UserProviderCreate, int)) *UserProviderCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &UserProviderCreateBulk{err: fmt.Errorf("calling to UserProviderClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*UserProviderCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &UserProviderCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for UserProvider.
+func (c *UserProviderClient) Update() *UserProviderUpdate {
+	mutation := newUserProviderMutation(c.config, OpUpdate)
+	return &UserProviderUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *UserProviderClient) UpdateOne(up *UserProvider) *UserProviderUpdateOne {
+	mutation := newUserProviderMutation(c.config, OpUpdateOne, withUserProvider(up))
+	return &UserProviderUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *UserProviderClient) UpdateOneID(id int) *UserProviderUpdateOne {
+	mutation := newUserProviderMutation(c.config, OpUpdateOne, withUserProviderID(id))
+	return &UserProviderUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for UserProvider.
+func (c *UserProviderClient) Delete() *UserProviderDelete {
+	mutation := newUserProviderMutation(c.config, OpDelete)
+	return &UserProviderDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *UserProviderClient) DeleteOne(up *UserProvider) *UserProviderDeleteOne {
+	return c.DeleteOneID(up.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *UserProviderClient) DeleteOneID(id int) *UserProviderDeleteOne {
+	builder := c.Delete().Where(userprovider.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &UserProviderDeleteOne{builder}
+}
+
+// Query returns a query builder for UserProvider.
+func (c *UserProviderClient) Query() *UserProviderQuery {
+	return &UserProviderQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeUserProvider},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a UserProvider entity by its id.
+func (c *UserProviderClient) Get(ctx context.Context, id int) (*UserProvider, error) {
+	return c.Query().Where(userprovider.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *UserProviderClient) GetX(ctx context.Context, id int) *UserProvider {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryUser queries the user edge of a UserProvider.
+func (c *UserProviderClient) QueryUser(up *UserProvider) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := up.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(userprovider.Table, userprovider.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, userprovider.UserTable, userprovider.UserColumn),
+		)
+		fromV = sqlgraph.Neighbors(up.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *UserProviderClient) Hooks() []Hook {
+	return c.hooks.UserProvider
+}
+
+// Interceptors returns the client interceptors.
+func (c *UserProviderClient) Interceptors() []Interceptor {
+	return c.inters.UserProvider
+}
+
+func (c *UserProviderClient) mutate(ctx context.Context, m *UserProviderMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&UserProviderCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&UserProviderUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&UserProviderUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&UserProviderDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown UserProvider mutation op: %q", m.Op())
+	}
+}
+
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		User []ent.Hook
+		User, UserProvider []ent.Hook
 	}
 	inters struct {
-		User []ent.Interceptor
+		User, UserProvider []ent.Interceptor
 	}
 )

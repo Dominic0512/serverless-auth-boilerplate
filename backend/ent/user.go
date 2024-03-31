@@ -29,8 +29,29 @@ type User struct {
 	// Password holds the value of the "password" field.
 	Password *string `json:"password,omitempty"`
 	// CreatedAt holds the value of the "createdAt" field.
-	CreatedAt    time.Time `json:"createdAt,omitempty"`
+	CreatedAt time.Time `json:"createdAt,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the UserQuery when eager-loading is set.
+	Edges        UserEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// UserEdges holds the relations/edges for other nodes in the graph.
+type UserEdges struct {
+	// UserProviders holds the value of the user_providers edge.
+	UserProviders []*UserProvider `json:"user_providers,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// UserProvidersOrErr returns the UserProviders value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) UserProvidersOrErr() ([]*UserProvider, error) {
+	if e.loadedTypes[0] {
+		return e.UserProviders, nil
+	}
+	return nil, &NotLoadedError{edge: "user_providers"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -113,6 +134,11 @@ func (u *User) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (u *User) Value(name string) (ent.Value, error) {
 	return u.selectValues.Get(name)
+}
+
+// QueryUserProviders queries the "user_providers" edge of the User entity.
+func (u *User) QueryUserProviders() *UserProviderQuery {
+	return NewUserClient(u.config).QueryUserProviders(u)
 }
 
 // Update returns a builder for updating this User.

@@ -24,11 +24,43 @@ var (
 		Columns:    UsersColumns,
 		PrimaryKey: []*schema.Column{UsersColumns[0]},
 	}
+	// UserProvidersColumns holds the columns for the "user_providers" table.
+	UserProvidersColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "picture", Type: field.TypeString, Nullable: true},
+		{Name: "name", Type: field.TypeEnum, Enums: []string{"PPIMARY", "FACEBOOK", "GOOGLE"}, Default: "PPIMARY"},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "user_id", Type: field.TypeUUID},
+	}
+	// UserProvidersTable holds the schema information for the "user_providers" table.
+	UserProvidersTable = &schema.Table{
+		Name:       "user_providers",
+		Columns:    UserProvidersColumns,
+		PrimaryKey: []*schema.Column{UserProvidersColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "user_providers_users_user_providers",
+				Columns:    []*schema.Column{UserProvidersColumns[5]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "userprovider_user_id_name",
+				Unique:  true,
+				Columns: []*schema.Column{UserProvidersColumns[5], UserProvidersColumns[2]},
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		UsersTable,
+		UserProvidersTable,
 	}
 )
 
 func init() {
+	UserProvidersTable.ForeignKeys[0].RefTable = UsersTable
 }

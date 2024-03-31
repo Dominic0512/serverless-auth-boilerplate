@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/Dominic0512/serverless-auth-boilerplate/ent/user"
+	"github.com/Dominic0512/serverless-auth-boilerplate/ent/userprovider"
 	"github.com/google/uuid"
 )
 
@@ -101,6 +102,21 @@ func (uc *UserCreate) SetNillableID(u *uuid.UUID) *UserCreate {
 		uc.SetID(*u)
 	}
 	return uc
+}
+
+// AddUserProviderIDs adds the "user_providers" edge to the UserProvider entity by IDs.
+func (uc *UserCreate) AddUserProviderIDs(ids ...int) *UserCreate {
+	uc.mutation.AddUserProviderIDs(ids...)
+	return uc
+}
+
+// AddUserProviders adds the "user_providers" edges to the UserProvider entity.
+func (uc *UserCreate) AddUserProviders(u ...*UserProvider) *UserCreate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uc.AddUserProviderIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -246,6 +262,22 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.CreatedAt(); ok {
 		_spec.SetField(user.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
+	}
+	if nodes := uc.mutation.UserProvidersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.UserProvidersTable,
+			Columns: []string{user.UserProvidersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(userprovider.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

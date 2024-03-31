@@ -70,5 +70,7 @@ func (ur UserRepository) Delete(id uuid.UUID) error {
 }
 
 func NewUserRepository(db *database.Database) *UserRepository {
-	return &UserRepository{User: db.Client.User}
+	return &UserRepository{
+		User: db.Client.User,
+	}
 }
