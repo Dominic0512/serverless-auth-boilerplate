@@ -1,8 +1,11 @@
 package domain
 
 import (
+	"context"
+
 	"github.com/Dominic0512/serverless-auth-boilerplate/ent"
 	"github.com/Dominic0512/serverless-auth-boilerplate/ent/userprovider"
+	"github.com/Dominic0512/serverless-auth-boilerplate/infra/database"
 )
 
 const (
@@ -20,5 +23,5 @@ type UserProvider struct {
 }
 
 type UserProviderRepository interface {
-	Create(userProvider UserProviderEntity) (*UserProviderEntity, error)
+	Create(ctx context.Context, tx database.Tx, userProvider UserProviderEntity) (*UserProviderEntity, error)
 }

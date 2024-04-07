@@ -3,7 +3,12 @@
 package mocks
 
 import (
+	context "context"
+
+	database "github.com/Dominic0512/serverless-auth-boilerplate/infra/database"
+
 	ent "github.com/Dominic0512/serverless-auth-boilerplate/ent"
+
 	mock "github.com/stretchr/testify/mock"
 
 	uuid "github.com/google/uuid"
@@ -14,9 +19,9 @@ type UserRepository struct {
 	mock.Mock
 }
 
-// Create provides a mock function with given fields: user
-func (_m *UserRepository) Create(user ent.User) (*ent.User, error) {
-	ret := _m.Called(user)
+// Create provides a mock function with given fields: ctx, tx, user
+func (_m *UserRepository) Create(ctx context.Context, tx database.Tx, user ent.User) (*ent.User, error) {
+	ret := _m.Called(ctx, tx, user)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Create")
@@ -24,19 +29,19 @@ func (_m *UserRepository) Create(user ent.User) (*ent.User, error) {
 
 	var r0 *ent.User
 	var r1 error
-	if rf, ok := ret.Get(0).(func(ent.User) (*ent.User, error)); ok {
-		return rf(user)
+	if rf, ok := ret.Get(0).(func(context.Context, database.Tx, ent.User) (*ent.User, error)); ok {
+		return rf(ctx, tx, user)
 	}
-	if rf, ok := ret.Get(0).(func(ent.User) *ent.User); ok {
-		r0 = rf(user)
+	if rf, ok := ret.Get(0).(func(context.Context, database.Tx, ent.User) *ent.User); ok {
+		r0 = rf(ctx, tx, user)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*ent.User)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(ent.User) error); ok {
-		r1 = rf(user)
+	if rf, ok := ret.Get(1).(func(context.Context, database.Tx, ent.User) error); ok {
+		r1 = rf(ctx, tx, user)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -44,17 +49,17 @@ func (_m *UserRepository) Create(user ent.User) (*ent.User, error) {
 	return r0, r1
 }
 
-// Delete provides a mock function with given fields: id
-func (_m *UserRepository) Delete(id uuid.UUID) error {
-	ret := _m.Called(id)
+// Delete provides a mock function with given fields: ctx, id
+func (_m *UserRepository) Delete(ctx context.Context, id uuid.UUID) error {
+	ret := _m.Called(ctx, id)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Delete")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(uuid.UUID) error); ok {
-		r0 = rf(id)
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) error); ok {
+		r0 = rf(ctx, id)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -62,9 +67,9 @@ func (_m *UserRepository) Delete(id uuid.UUID) error {
 	return r0
 }
 
-// Find provides a mock function with given fields:
-func (_m *UserRepository) Find() ([]*ent.User, error) {
-	ret := _m.Called()
+// Find provides a mock function with given fields: ctx
+func (_m *UserRepository) Find(ctx context.Context) ([]*ent.User, error) {
+	ret := _m.Called(ctx)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Find")
@@ -72,19 +77,19 @@ func (_m *UserRepository) Find() ([]*ent.User, error) {
 
 	var r0 []*ent.User
 	var r1 error
-	if rf, ok := ret.Get(0).(func() ([]*ent.User, error)); ok {
-		return rf()
+	if rf, ok := ret.Get(0).(func(context.Context) ([]*ent.User, error)); ok {
+		return rf(ctx)
 	}
-	if rf, ok := ret.Get(0).(func() []*ent.User); ok {
-		r0 = rf()
+	if rf, ok := ret.Get(0).(func(context.Context) []*ent.User); ok {
+		r0 = rf(ctx)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]*ent.User)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func() error); ok {
-		r1 = rf()
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -92,9 +97,9 @@ func (_m *UserRepository) Find() ([]*ent.User, error) {
 	return r0, r1
 }
 
-// FindOne provides a mock function with given fields: id
-func (_m *UserRepository) FindOne(id uuid.UUID) (*ent.User, error) {
-	ret := _m.Called(id)
+// FindOne provides a mock function with given fields: ctx, id
+func (_m *UserRepository) FindOne(ctx context.Context, id uuid.UUID) (*ent.User, error) {
+	ret := _m.Called(ctx, id)
 
 	if len(ret) == 0 {
 		panic("no return value specified for FindOne")
@@ -102,19 +107,19 @@ func (_m *UserRepository) FindOne(id uuid.UUID) (*ent.User, error) {
 
 	var r0 *ent.User
 	var r1 error
-	if rf, ok := ret.Get(0).(func(uuid.UUID) (*ent.User, error)); ok {
-		return rf(id)
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) (*ent.User, error)); ok {
+		return rf(ctx, id)
 	}
-	if rf, ok := ret.Get(0).(func(uuid.UUID) *ent.User); ok {
-		r0 = rf(id)
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) *ent.User); ok {
+		r0 = rf(ctx, id)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*ent.User)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(uuid.UUID) error); ok {
-		r1 = rf(id)
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID) error); ok {
+		r1 = rf(ctx, id)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -122,9 +127,39 @@ func (_m *UserRepository) FindOne(id uuid.UUID) (*ent.User, error) {
 	return r0, r1
 }
 
-// Update provides a mock function with given fields: id, properties
-func (_m *UserRepository) Update(id uuid.UUID, properties ent.User) (*ent.User, error) {
-	ret := _m.Called(id, properties)
+// FindOneByEmail provides a mock function with given fields: ctx, email
+func (_m *UserRepository) FindOneByEmail(ctx context.Context, email string) (*ent.User, error) {
+	ret := _m.Called(ctx, email)
+
+	if len(ret) == 0 {
+		panic("no return value specified for FindOneByEmail")
+	}
+
+	var r0 *ent.User
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) (*ent.User, error)); ok {
+		return rf(ctx, email)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string) *ent.User); ok {
+		r0 = rf(ctx, email)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*ent.User)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, email)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Update provides a mock function with given fields: ctx, id, properties
+func (_m *UserRepository) Update(ctx context.Context, id uuid.UUID, properties ent.User) (*ent.User, error) {
+	ret := _m.Called(ctx, id, properties)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Update")
@@ -132,19 +167,19 @@ func (_m *UserRepository) Update(id uuid.UUID, properties ent.User) (*ent.User, 
 
 	var r0 *ent.User
 	var r1 error
-	if rf, ok := ret.Get(0).(func(uuid.UUID, ent.User) (*ent.User, error)); ok {
-		return rf(id, properties)
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, ent.User) (*ent.User, error)); ok {
+		return rf(ctx, id, properties)
 	}
-	if rf, ok := ret.Get(0).(func(uuid.UUID, ent.User) *ent.User); ok {
-		r0 = rf(id, properties)
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, ent.User) *ent.User); ok {
+		r0 = rf(ctx, id, properties)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*ent.User)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(uuid.UUID, ent.User) error); ok {
-		r1 = rf(id, properties)
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, ent.User) error); ok {
+		r1 = rf(ctx, id, properties)
 	} else {
 		r1 = ret.Error(1)
 	}

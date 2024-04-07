@@ -57,7 +57,10 @@ func (auth *Auth0Authenticator) ExchangeMetaDataByCode(code string) (*AuthMetaDa
 	var claims struct {
 		Email    string `json:"email"`
 		Verified bool   `json:"email_verified"`
+		Picture  string `json:"picture"`
+		Sub      string `json:"sub"`
 	}
+
 	if err := idToken.Claims(&claims); err != nil {
 		return nil, err
 	}
@@ -66,6 +69,8 @@ func (auth *Auth0Authenticator) ExchangeMetaDataByCode(code string) (*AuthMetaDa
 		AccessToken:   oauth2Token.AccessToken,
 		Email:         claims.Email,
 		EmailVerified: claims.Verified,
+		Picture:       claims.Picture,
+		Sub:           claims.Sub,
 	}, nil
 }
 

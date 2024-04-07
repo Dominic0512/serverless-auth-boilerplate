@@ -8,6 +8,8 @@ type AuthMetaData struct {
 	AccessToken   string
 	Email         string
 	EmailVerified bool
+	Picture       string
+	Sub           string
 }
 
 type Authenticator interface {

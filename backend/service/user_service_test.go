@@ -11,42 +11,37 @@ import (
 )
 
 func TestUserService_Find(t *testing.T) {
-	repo := new(mocks.UserRepository)
+	txHelper := new(mocks.TxHelper)
+	userRepo := new(mocks.UserRepository)
+	userProviderRepo := new(mocks.UserProviderRepository)
 	pwh := new(mocks.PasswordHelper)
 
-	repo.On("Find").Return(func() (users []*domain.UserEntity) {
-		return []*domain.UserEntity{}
-	}, func() error {
-		return nil
-	})
+	userRepo.On("Find", mock.AnythingOfType("backgroundCtx")).Return([]*domain.UserEntity{}, nil)
 
-	userService := NewUserService(repo, pwh)
+	userService := NewUserService(txHelper, userRepo, userProviderRepo, pwh)
 
 	t.Run("it should return result even there are nothing", func(t *testing.T) {
 		users, err := userService.Find()
-		if err != nil {
-			t.Fatalf("user service find users error: %v", err)
-		}
 
-		assert.Equal(t, 0, len(users))
+		a := assert.New(t)
+		a.Nil(err)
+		a.Equal(0, len(users))
 	})
 }
 
 func TestUserService_FindOne(t *testing.T) {
 	dummyID := uuid.New()
-	repo := new(mocks.UserRepository)
+	txHelper := new(mocks.TxHelper)
+	userRepo := new(mocks.UserRepository)
+	userProviderRepo := new(mocks.UserProviderRepository)
 	pwh := new(mocks.PasswordHelper)
 
-	repo.On("FindOne", mock.AnythingOfType("UUID")).Return(
-		func(id uuid.UUID) *domain.UserEntity {
-			return &domain.UserEntity{ID: dummyID}
-		},
-		func(id uuid.UUID) error {
-			return nil
-		},
+	userRepo.On("FindOne", mock.AnythingOfType("backgroundCtx"), mock.AnythingOfType("UUID")).Return(
+		&domain.UserEntity{ID: dummyID},
+		nil,
 	)
 
-	userService := NewUserService(repo, pwh)
+	userService := NewUserService(txHelper, userRepo, userProviderRepo, pwh)
 
 	t.Run("it should return the result", func(t *testing.T) {
 		user, err := userService.FindByID(dummyID.String())
@@ -65,31 +60,52 @@ func TestUserService_FindOne(t *testing.T) {
 }
 
 func TestUserService_Create(t *testing.T) {
-	repo := new(mocks.UserRepository)
+	txHelper := new(mocks.TxHelper)
+	userRepo := new(mocks.UserRepository)
+	userProviderRepo := new(mocks.UserProviderRepository)
 	pwh := new(mocks.PasswordHelper)
 
 	pwh.On("Hash", mock.AnythingOfType("string")).Return(
 		func(password string) string {
 			return ""
 		},
-		func(password string) error {
+		func() error {
 			return nil
 		},
 	)
 
-	repo.On("Create", mock.AnythingOfType("User")).Return(
+	userRepo.On("Create", mock.AnythingOfType("backgroundCtx"), mock.AnythingOfType("Tx"), mock.AnythingOfType("User")).Return(
 		func(user domain.UserEntity) *domain.UserEntity {
 			return &domain.UserEntity{
 				Email:    user.Email,
 				Password: user.Password,
 			}
 		},
-		func(user domain.UserEntity) error {
+		func() error {
+			return nil
+		},
+	).On("FindOneByEmail", mock.AnythingOfType("backgroundCtx"), mock.AnythingOfType("string")).Return(
+		&domain.UserEntity{
+			Email: "dummy@gmail.com",
+		},
+		nil,
+	)
+
+	userProviderRepo.On("Create", mock.AnythingOfType("backgroundCtx"), mock.AnythingOfType("Tx"), mock.AnythingOfType("UserProvider")).Return(
+		func(userProvider domain.UserProviderEntity) *domain.UserProviderEntity {
+			return &domain.UserProviderEntity{
+				Picture: "dummy picture",
+				Name:    domain.UserProviderNamePrimary,
+			}
+		},
+		func() error {
 			return nil
 		},
 	)
 
-	userService := NewUserService(repo, pwh)
+	txHelper.On("WithTx", mock.Anything, mock.Anything).Return(nil)
+
+	userService := NewUserService(txHelper, userRepo, userProviderRepo, pwh)
 
 	t.Run("it should create a new user with password", func(t *testing.T) {
 		input := domain.CreateUserInput{
@@ -99,16 +115,18 @@ func TestUserService_Create(t *testing.T) {
 		user, err := userService.Create(input)
 
 		a := assert.New(t)
-		a.NotNil(user.Password)
+		a.NotNil(user)
 		a.Nil(err)
 	})
 }
 
 func TestUserService_CreateWithoutPassword(t *testing.T) {
-	repo := new(mocks.UserRepository)
+	txHelper := new(mocks.TxHelper)
+	userRepo := new(mocks.UserRepository)
+	userProviderRepo := new(mocks.UserProviderRepository)
 	pwh := new(mocks.PasswordHelper)
 
-	repo.On("Create", mock.AnythingOfType("User")).Return(
+	userRepo.On("Create", mock.AnythingOfType("backgroundCtx"), mock.AnythingOfType("Tx"), mock.AnythingOfType("User")).Return(
 		func(user domain.UserEntity) *domain.UserEntity {
 			return &domain.UserEntity{
 				Email: user.Email,
@@ -117,9 +135,28 @@ func TestUserService_CreateWithoutPassword(t *testing.T) {
 		func(user domain.UserEntity) error {
 			return nil
 		},
+	).On("FindOneByEmail", mock.AnythingOfType("backgroundCtx"), mock.AnythingOfType("string")).Return(
+		&domain.UserEntity{
+			Email: "dummy@gmail.com",
+		},
+		nil,
 	)
 
-	userService := NewUserService(repo, pwh)
+	userProviderRepo.On("Create", mock.AnythingOfType("backgroundCtx"), mock.AnythingOfType("Tx"), mock.AnythingOfType("UserProvider")).Return(
+		func(userProvider domain.UserProviderEntity) *domain.UserProviderEntity {
+			return &domain.UserProviderEntity{
+				Picture: "dummy picture",
+				Name:    domain.UserProviderNamePrimary,
+			}
+		},
+		func() error {
+			return nil
+		},
+	)
+
+	txHelper.On("WithTx", mock.Anything, mock.Anything).Return(nil)
+
+	userService := NewUserService(txHelper, userRepo, userProviderRepo, pwh)
 
 	t.Run("it should create a new user without password", func(t *testing.T) {
 		input := domain.CreateUserWithoutPasswordInput{
@@ -128,26 +165,27 @@ func TestUserService_CreateWithoutPassword(t *testing.T) {
 		user, err := userService.CreateWithoutPassword(input)
 
 		a := assert.New(t)
-		a.Nil(user.Password)
+		a.NotNil(user)
 		a.Nil(err)
 	})
 }
 
 func TestUserService_Update(t *testing.T) {
 	dummyID := uuid.New()
-	repo := new(mocks.UserRepository)
+	txHelper := new(mocks.TxHelper)
+	userRepo := new(mocks.UserRepository)
+	userProviderRepo := new(mocks.UserProviderRepository)
 	pwh := new(mocks.PasswordHelper)
 
-	repo.On("Update", mock.AnythingOfType("UUID"), mock.AnythingOfType("User")).Return(
-		func(id uuid.UUID, user domain.UserEntity) *domain.UserEntity {
-			return &domain.UserEntity{ID: dummyID, Name: user.Name}
+	userRepo.On("Update", mock.AnythingOfType("backgroundCtx"), mock.AnythingOfType("UUID"), mock.AnythingOfType("User")).Return(
+		&domain.UserEntity{
+			ID:   dummyID,
+			Name: "modified",
 		},
-		func(id uuid.UUID, user domain.UserEntity) error {
-			return nil
-		},
+		nil,
 	)
 
-	userService := NewUserService(repo, pwh)
+	userService := NewUserService(txHelper, userRepo, userProviderRepo, pwh)
 
 	t.Run("it should return the result with updatable fields", func(t *testing.T) {
 		input := domain.UpdateUserInput{
@@ -176,16 +214,14 @@ func TestUserService_Update(t *testing.T) {
 
 func TestUserService_Delete(t *testing.T) {
 	dummyID := uuid.New()
-	repo := new(mocks.UserRepository)
+	txHelper := new(mocks.TxHelper)
+	userRepo := new(mocks.UserRepository)
+	userProviderRepo := new(mocks.UserProviderRepository)
 	pwh := new(mocks.PasswordHelper)
 
-	repo.On("Delete", mock.AnythingOfType("UUID")).Return(
-		func(id uuid.UUID) error {
-			return nil
-		},
-	)
+	userRepo.On("Delete", mock.AnythingOfType("backgroundCtx"), mock.AnythingOfType("UUID")).Return(nil)
 
-	userService := NewUserService(repo, pwh)
+	userService := NewUserService(txHelper, userRepo, userProviderRepo, pwh)
 
 	t.Run("it should return the result", func(t *testing.T) {
 		input := domain.MaunipulateUserInput{

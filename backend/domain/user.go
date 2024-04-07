@@ -1,7 +1,10 @@
 package domain
 
 import (
+	"context"
+
 	"github.com/Dominic0512/serverless-auth-boilerplate/ent"
+	"github.com/Dominic0512/serverless-auth-boilerplate/infra/database"
 	"github.com/google/uuid"
 )
 
@@ -32,9 +35,10 @@ type UpdateUserInput struct {
 }
 
 type UserRepository interface {
-	Find() ([]*UserEntity, error)
-	FindOne(id uuid.UUID) (*UserEntity, error)
-	Create(user UserEntity) (*UserEntity, error)
-	Update(id uuid.UUID, properties UserEntity) (*UserEntity, error)
-	Delete(id uuid.UUID) error
+	Find(ctx context.Context) ([]*UserEntity, error)
+	FindOne(ctx context.Context, id uuid.UUID) (*UserEntity, error)
+	FindOneByEmail(ctx context.Context, email string) (*UserEntity, error)
+	Create(ctx context.Context, tx database.Tx, user UserEntity) (*UserEntity, error)
+	Update(ctx context.Context, id uuid.UUID, properties UserEntity) (*UserEntity, error)
+	Delete(ctx context.Context, id uuid.UUID) error
 }
