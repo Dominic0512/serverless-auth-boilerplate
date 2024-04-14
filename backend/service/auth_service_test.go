@@ -2,15 +2,74 @@ package service
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/Dominic0512/serverless-auth-boilerplate/domain"
 	"github.com/Dominic0512/serverless-auth-boilerplate/infra/authenticator"
 	"github.com/Dominic0512/serverless-auth-boilerplate/infra/database"
 	"github.com/Dominic0512/serverless-auth-boilerplate/mocks"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
+
+func TestAuthService_doUserCreationWithProvider(t *testing.T) {
+	txHelper := new(mocks.TxHelper)
+	userRepo := new(mocks.UserRepository)
+	userProviderRepo := new(mocks.UserProviderRepository)
+	auth := new(mocks.Authenticator)
+
+	as := NewAuthService(txHelper, userRepo, userProviderRepo, auth)
+
+	t.Run("it will success", func(t *testing.T) {
+		userRepo.On("Create", mock.AnythingOfType("backgroundCtx"), mock.AnythingOfType("Tx"), mock.AnythingOfType("User")).Return(
+			&domain.UserEntity{
+				Email: "dummy@gmail.com",
+			}, nil,
+		).Once()
+
+		userProviderRepo.On("Create", mock.AnythingOfType("backgroundCtx"), mock.AnythingOfType("Tx"), mock.AnythingOfType("UserProvider")).Return(
+			&domain.UserProviderEntity{
+				Picture: "dummy picture",
+				Name:    domain.UserProviderNamePrimary,
+			}, nil,
+		).Once()
+
+		var tx database.Tx
+		err := as.doUserCreationWithProvider(context.Background(), tx, &authenticator.AuthMetaData{Email: "dummy@gmail.com"})
+		a := assert.New(t)
+		a.Nil(err)
+	})
+
+	t.Run("it will failure by user creation", func(t *testing.T) {
+		userRepo.On("Create", mock.AnythingOfType("backgroundCtx"), mock.AnythingOfType("Tx"), mock.AnythingOfType("User")).Return(
+			nil, errors.New("user creation dummy error"),
+		).Once()
+
+		err := as.doUserCreationWithProvider(context.Background(), nil, &authenticator.AuthMetaData{Email: "dummy@gmail.com"})
+
+		a := assert.New(t)
+		a.Error(err)
+	})
+
+	t.Run("it will failure by user provider creation", func(t *testing.T) {
+		userRepo.On("Create", mock.AnythingOfType("backgroundCtx"), mock.AnythingOfType("Tx"), mock.AnythingOfType("User")).Return(
+			&domain.UserEntity{
+				ID:    uuid.New(),
+				Email: "dummy@gmail.com",
+			}, nil,
+		).Once()
+
+		userProviderRepo.On("Create", mock.AnythingOfType("backgroundCtx"), mock.AnythingOfType("Tx"), mock.AnythingOfType("UserProvider")).Return(
+			nil, errors.New("user provider creation dummy error"),
+		).Once()
+
+		err := as.doUserCreationWithProvider(context.Background(), nil, &authenticator.AuthMetaData{Email: "dummy@gmail.com"})
+		a := assert.New(t)
+		a.Error(err)
+	})
+}
 
 func TestAuthService_GenerateAuthURL(t *testing.T) {
 	txHelper := new(mocks.TxHelper)
@@ -42,29 +101,6 @@ func TestAuthService_SignUp(t *testing.T) {
 	userRepo := new(mocks.UserRepository)
 	userProviderRepo := new(mocks.UserProviderRepository)
 	auth := new(mocks.Authenticator)
-
-	userRepo.On("Create", mock.AnythingOfType("Context"), mock.AnythingOfType("Tx"), mock.AnythingOfType("User")).Return(
-		func(ctx context.Context, tx database.Tx, user domain.UserEntity) *domain.UserEntity {
-			return &domain.UserEntity{
-				Email: user.Email,
-			}
-		},
-		func(user domain.UserEntity) error {
-			return nil
-		},
-	)
-
-	userProviderRepo.On("Create", mock.AnythingOfType("Context"), mock.AnythingOfType("Tx"), mock.AnythingOfType("UserProvider")).Return(
-		func(userProvider domain.UserProviderEntity) *domain.UserProviderEntity {
-			return &domain.UserProviderEntity{
-				Picture: "dummy picture",
-				Name:    domain.UserProviderNamePrimary,
-			}
-		},
-		func(userProvider domain.UserProviderEntity) error {
-			return nil
-		},
-	)
 
 	txHelper.On("WithTx", mock.Anything, mock.Anything).Return(nil)
 

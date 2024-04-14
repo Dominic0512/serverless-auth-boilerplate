@@ -19,9 +19,9 @@ type UserRepository struct {
 	mock.Mock
 }
 
-// Create provides a mock function with given fields: ctx, tx, user
-func (_m *UserRepository) Create(ctx context.Context, tx database.Tx, user ent.User) (*ent.User, error) {
-	ret := _m.Called(ctx, tx, user)
+// Create provides a mock function with given fields: ctx, tx, properties
+func (_m *UserRepository) Create(ctx context.Context, tx database.Tx, properties ent.User) (*ent.User, error) {
+	ret := _m.Called(ctx, tx, properties)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Create")
@@ -30,10 +30,10 @@ func (_m *UserRepository) Create(ctx context.Context, tx database.Tx, user ent.U
 	var r0 *ent.User
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, database.Tx, ent.User) (*ent.User, error)); ok {
-		return rf(ctx, tx, user)
+		return rf(ctx, tx, properties)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, database.Tx, ent.User) *ent.User); ok {
-		r0 = rf(ctx, tx, user)
+		r0 = rf(ctx, tx, properties)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*ent.User)
@@ -41,7 +41,7 @@ func (_m *UserRepository) Create(ctx context.Context, tx database.Tx, user ent.U
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, database.Tx, ent.User) error); ok {
-		r1 = rf(ctx, tx, user)
+		r1 = rf(ctx, tx, properties)
 	} else {
 		r1 = ret.Error(1)
 	}
