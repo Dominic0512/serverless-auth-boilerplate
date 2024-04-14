@@ -15,32 +15,32 @@ type UserRepository struct {
 }
 
 func (ur UserRepository) Find(ctx context.Context) ([]*domain.UserEntity, error) {
-	u, err := ur.User.Query().All(ctx)
+	user, err := ur.User.Query().All(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query all user: %w", err)
 	}
-	return u, nil
+	return user, nil
 }
 
 func (ur UserRepository) FindOne(ctx context.Context, id uuid.UUID) (*domain.UserEntity, error) {
-	u, err := ur.User.Query().Where(user.ID(id)).Only(ctx)
+	user, err := ur.User.Query().Where(user.ID(id)).Only(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query single user: %w", err)
 	}
 
-	return u, nil
+	return user, nil
 }
 
-func (ur UserRepository) FineOneByEmail(ctx context.Context, email string) (*domain.UserEntity, error) {
-	u, err := ur.User.Query().Where(user.Email(email)).Only(ctx)
+func (ur UserRepository) FindOneByEmail(ctx context.Context, email string) (*domain.UserEntity, error) {
+	user, err := ur.User.Query().Where(user.Email(email)).Only(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query single user: %w", err)
 	}
 
-	return u, nil
+	return user, nil
 }
 
-func (ur UserRepository) Create(ctx context.Context, tx database.Tx, user domain.UserEntity) (*domain.UserEntity, error) {
+func (ur UserRepository) Create(ctx context.Context, tx database.Tx, properties domain.UserEntity) (*domain.UserEntity, error) {
 	repo := ur.User
 
 	if tx != nil {
@@ -48,23 +48,23 @@ func (ur UserRepository) Create(ctx context.Context, tx database.Tx, user domain
 	}
 
 	mutate := repo.Create().
-		SetEmail(user.Email).
-		SetName(user.Name)
+		SetEmail(properties.Email).
+		SetName(properties.Name)
 
-	if user.Password != nil {
-		mutate.SetPassword(*user.Password)
+	if properties.Password != nil {
+		mutate.SetPassword(*properties.Password)
 	}
 
-	u, err := mutate.Save(ctx)
+	user, err := mutate.Save(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create user: %w", err)
 	}
 
-	return u, nil
+	return user, nil
 }
 
 func (ur UserRepository) Update(ctx context.Context, id uuid.UUID, properties domain.UserEntity) (*domain.UserEntity, error) {
-	u, err := ur.User.UpdateOneID(id).
+	user, err := ur.User.UpdateOneID(id).
 		SetName(properties.Name).
 		Save(ctx)
 	if err != nil {
@@ -72,7 +72,7 @@ func (ur UserRepository) Update(ctx context.Context, id uuid.UUID, properties do
 		return nil, fmt.Errorf("failed to update user: %w", err)
 	}
 
-	return u, nil
+	return user, nil
 }
 
 func (ur UserRepository) Delete(ctx context.Context, id uuid.UUID) error {
@@ -84,7 +84,7 @@ func (ur UserRepository) Delete(ctx context.Context, id uuid.UUID) error {
 	return nil
 }
 
-func NewUserRepository(db *database.Database) *UserRepository {
+func NewUserRepository(db *database.PSQLDatabase) *UserRepository {
 	return &UserRepository{
 		User: db.Client.User,
 	}

@@ -9,7 +9,11 @@ import (
 	"github.com/Dominic0512/serverless-auth-boilerplate/infra/config"
 )
 
-func NewPSQLDatabase(config *config.Config) (*Database, error) {
+type PSQLDatabase struct {
+	Client *ent.Client
+}
+
+func NewPSQLDatabase(config *config.Config) (*PSQLDatabase, error) {
 	driver := config.DBDriver
 	username := config.DBUsername
 	password := config.DBPassword
@@ -30,7 +34,7 @@ func NewPSQLDatabase(config *config.Config) (*Database, error) {
 		return nil, err
 	}
 
-	return &Database{
+	return &PSQLDatabase{
 		Client: client,
 	}, nil
 }

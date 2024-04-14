@@ -8,7 +8,7 @@ import (
 )
 
 type EntTxHelper struct {
-	db *database.Database
+	db *database.PSQLDatabase
 }
 
 func (th *EntTxHelper) WithTx(ctx context.Context, fn func(tx database.Tx) error) error {
@@ -34,7 +34,7 @@ func (th *EntTxHelper) WithTx(ctx context.Context, fn func(tx database.Tx) error
 	return nil
 }
 
-func NewEntTxHelper(db *database.Database) *EntTxHelper {
+func NewEntTxHelper(db *database.PSQLDatabase) *EntTxHelper {
 	return &EntTxHelper{
 		db,
 	}

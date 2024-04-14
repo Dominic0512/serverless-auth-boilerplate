@@ -12,7 +12,7 @@ type UserProviderRepository struct {
 	UserProvider *domain.UserProviderClient
 }
 
-func (upr UserProviderRepository) Create(ctx context.Context, tx database.Tx, userProvider domain.UserProviderEntity) (*domain.UserProviderEntity, error) {
+func (upr UserProviderRepository) Create(ctx context.Context, tx database.Tx, properties domain.UserProviderEntity) (*domain.UserProviderEntity, error) {
 	repo := upr.UserProvider
 
 	if tx != nil {
@@ -20,18 +20,18 @@ func (upr UserProviderRepository) Create(ctx context.Context, tx database.Tx, us
 	}
 
 	mutate := repo.Create().
-		SetName(userProvider.Name).
-		SetUserID(userProvider.UserID)
+		SetName(properties.Name).
+		SetUserID(properties.UserID)
 
-	up, err := mutate.Save(ctx)
+	userProvider, err := mutate.Save(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create user provider: %w", err)
 	}
 
-	return up, nil
+	return userProvider, nil
 }
 
-func NewUserProviderRepository(db *database.Database) *UserProviderRepository {
+func NewUserProviderRepository(db *database.PSQLDatabase) *UserProviderRepository {
 	return &UserProviderRepository{
 		UserProvider: db.Client.UserProvider,
 	}

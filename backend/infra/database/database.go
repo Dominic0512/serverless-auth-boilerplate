@@ -5,10 +5,6 @@ import (
 	"github.com/google/wire"
 )
 
-type Database struct {
-	Client *ent.Client
-}
-
 type Tx *ent.Tx
 
 var ProviderSet = wire.NewSet(

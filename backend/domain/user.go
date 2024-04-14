@@ -38,7 +38,7 @@ type UserRepository interface {
 	Find(ctx context.Context) ([]*UserEntity, error)
 	FindOne(ctx context.Context, id uuid.UUID) (*UserEntity, error)
 	FindOneByEmail(ctx context.Context, email string) (*UserEntity, error)
-	Create(ctx context.Context, tx database.Tx, user UserEntity) (*UserEntity, error)
+	Create(ctx context.Context, tx database.Tx, properties UserEntity) (*UserEntity, error)
 	Update(ctx context.Context, id uuid.UUID, properties UserEntity) (*UserEntity, error)
 	Delete(ctx context.Context, id uuid.UUID) error
 }

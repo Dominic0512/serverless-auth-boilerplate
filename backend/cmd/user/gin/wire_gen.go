@@ -34,13 +34,15 @@ func InitializeApp() (*app.App, error) {
 	if err != nil {
 		return nil, err
 	}
-	databaseDatabase, err := database.NewDatabase(configConfig)
+	databaseDatabase, err := database.NewPSQLDatabase(configConfig)
 	if err != nil {
 		return nil, err
 	}
+	entTxHelper := helper.NewEntTxHelper(databaseDatabase)
 	userRepository := repository.NewUserRepository(databaseDatabase)
+	userProviderRepository := repository.NewUserProviderRepository(databaseDatabase)
 	bcryptPasswordHelper := helper.NewBcryptPasswordHelper()
-	userService := service.NewUserService(userRepository, bcryptPasswordHelper)
+	userService := service.NewUserService(entTxHelper, userRepository, userProviderRepository, bcryptPasswordHelper)
 	validator := validate.NewValidator()
 	userController := controller.NewUserController(userService, validator)
 	userRoute := route.NewUserRoute(engine, userController)
