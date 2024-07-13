@@ -25,14 +25,50 @@ func NewAuthController(
 }
 
 func (ac AuthController) GenerateAuthURL(c *gin.Context) {
+	url, err := ac.as.GenerateAuthURL()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Generate auth url failed.",
+		})
+		return
+	}
+
 	c.JSON(200, gin.H{
-		"url": ac.as.GenerateAuthURL(),
+		"url": url,
 	})
 }
 
 func (ac AuthController) SignIn(c *gin.Context) {
-	c.JSON(200, gin.H{
-		"message": "Sign-in successfully",
+	request := request.SignInRequest{}
+
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	if err := ac.v.Validate.Struct(request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	input := domain.OAuthSignInInput{
+		Code: request.Code,
+	}
+
+	token, err := ac.as.SignIn(input)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Sign in failed.",
+		})
+		return
+	}
+
+	c.JSON(http.StatusAccepted, gin.H{
+		"token": token,
 	})
 }
 

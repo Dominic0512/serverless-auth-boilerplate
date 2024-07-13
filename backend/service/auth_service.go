@@ -2,8 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
-	"log"
 	"strings"
 
 	"github.com/Dominic0512/serverless-auth-boilerplate/domain"
@@ -19,6 +17,25 @@ type AuthService struct {
 	auth             authenticator.Authenticator
 }
 
+func (as AuthService) exchangeMetaDataByCode(code string) (*authenticator.AuthMetaData, error) {
+	data, err := as.auth.ExchangeMetaDataByCode(code)
+	if err != nil {
+		return nil, &domain.InvalidError{
+			Entity:  "OAuthCode",
+			Message: err.Error(),
+		}
+	}
+
+	if !data.EmailVerified {
+		return nil, &domain.InvalidError{
+			Entity:  "Email",
+			Message: "Email is not verified",
+		}
+	}
+
+	return data, nil
+}
+
 func (as AuthService) doUserCreationWithProvider(ctx context.Context, tx database.Tx, data *authenticator.AuthMetaData) error {
 	userProps := domain.UserEntity{
 		Name:  strings.Split(data.Email, "@")[0],
@@ -26,8 +43,9 @@ func (as AuthService) doUserCreationWithProvider(ctx context.Context, tx databas
 	}
 	user, err := as.userRepo.Create(ctx, tx, userProps)
 	if err != nil {
-		log.Printf("Can not create user properly: %v", err)
-		return err
+		return &domain.EntityCreationError{
+			Entity: "User",
+		}
 	}
 
 	userProviderProps := domain.UserProviderEntity{
@@ -37,29 +55,29 @@ func (as AuthService) doUserCreationWithProvider(ctx context.Context, tx databas
 
 	var _ domain.UserProviderEntity
 	_, err = as.userProviderRepo.Create(ctx, tx, userProviderProps)
-	fmt.Println(err)
 	if err != nil {
-		log.Printf("Can not create user provider properly: %v", err)
-		return err
+		return &domain.EntityCreationError{
+			Entity: "UserProvider",
+		}
 	}
 
 	return nil
 }
 
-func (as AuthService) GenerateAuthURL() string {
+func (as AuthService) GenerateAuthURL() (*string, error) {
 	url, err := as.auth.GenerateAuthCodeURL()
 	if err != nil {
-		log.Printf("Can not generate auth code url: %v", err)
-		return ""
+		return nil, &domain.EntityCreationError{
+			Entity: "AuthCodeURL",
+		}
 	}
 
-	return url
+	return &url, nil
 }
 
 func (as AuthService) SignUp(input domain.OAuthSignUpInput) (*string, error) {
-	data, err := as.auth.ExchangeMetaDataByCode(input.Code)
+	data, err := as.exchangeMetaDataByCode(input.Code)
 	if err != nil {
-		log.Printf("Can not exchange meta data by code: %v", err)
 		return nil, err
 	}
 
@@ -74,7 +92,21 @@ func (as AuthService) SignUp(input domain.OAuthSignUpInput) (*string, error) {
 	return &data.AccessToken, nil
 }
 
-func (as AuthService) Login() {
+func (as AuthService) SignIn(input domain.OAuthSignInInput) (*string, error) {
+	data, err := as.exchangeMetaDataByCode(input.Code)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = as.userRepo.FindOneByEmail(context.Background(), data.Email)
+	if err != nil {
+		return nil, &domain.NotFoundError{
+			Entity: "User",
+			ID:     data.Email,
+		}
+	}
+
+	return &data.AccessToken, nil
 }
 
 func NewAuthService(
