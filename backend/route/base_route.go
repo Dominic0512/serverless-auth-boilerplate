@@ -3,11 +3,35 @@ package route
 import (
 	"fmt"
 
+	"github.com/Dominic0512/serverless-auth-boilerplate/route/middleware"
 	"github.com/gin-gonic/gin"
 )
 
 type BaseRoute struct {
-	router *gin.Engine
+	router                  *gin.Engine
+	authMiddleware          middleware.AuthMiddleware
+	errorHandlingMiddleware middleware.ErrorHandlingMiddleware
+}
+
+func (br BaseRoute) RegisterBeforeMiddlewares(fns ...gin.HandlerFunc) {
+	for i := range fns {
+		fn := fns[i]
+		br.router.Use(func(c *gin.Context) {
+			fn(c)
+			c.Next()
+		})
+	}
+}
+
+func (br BaseRoute) RegisterAfterMiddlewares(fns ...gin.HandlerFunc) {
+	// NOTE: Because gin middleware after next function is LIFO, we need to reverse the order of the fns
+	for i := range fns {
+		fn := fns[len(fns)-1-i]
+		br.router.Use(func(c *gin.Context) {
+			c.Next()
+			fn(c)
+		})
+	}
 }
 
 func (br BaseRoute) Setup() {
@@ -17,12 +41,19 @@ func (br BaseRoute) Setup() {
 			"message": "Alive...",
 		})
 	})
+
+	br.RegisterBeforeMiddlewares(br.authMiddleware.OAuthTokenGuard)
+	br.RegisterAfterMiddlewares(br.errorHandlingMiddleware.ErrorHandler)
 }
 
 func NewBaseRoute(
 	router *gin.Engine,
+	authMiddleware middleware.AuthMiddleware,
+	errorHandlingMiddleware middleware.ErrorHandlingMiddleware,
 ) BaseRoute {
 	return BaseRoute{
-		router: router,
+		router:                  router,
+		authMiddleware:          authMiddleware,
+		errorHandlingMiddleware: errorHandlingMiddleware,
 	}
 }

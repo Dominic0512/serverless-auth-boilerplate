@@ -20,14 +20,13 @@ type AuthService struct {
 func (as AuthService) exchangeMetaDataByCode(code string) (*authenticator.AuthMetaData, error) {
 	data, err := as.auth.ExchangeMetaDataByCode(code)
 	if err != nil {
-		return nil, &domain.InvalidError{
-			Entity:  "OAuthCode",
+		return nil, domain.AuthorizationError{
 			Message: err.Error(),
 		}
 	}
 
 	if !data.EmailVerified {
-		return nil, &domain.InvalidError{
+		return nil, domain.InvalidError{
 			Entity:  "Email",
 			Message: "Email is not verified",
 		}
@@ -43,7 +42,7 @@ func (as AuthService) doUserCreationWithProvider(ctx context.Context, tx databas
 	}
 	user, err := as.userRepo.Create(ctx, tx, userProps)
 	if err != nil {
-		return &domain.EntityCreationError{
+		return &domain.CreationError{
 			Entity: "User",
 		}
 	}
@@ -56,7 +55,7 @@ func (as AuthService) doUserCreationWithProvider(ctx context.Context, tx databas
 	var _ domain.UserProviderEntity
 	_, err = as.userProviderRepo.Create(ctx, tx, userProviderProps)
 	if err != nil {
-		return &domain.EntityCreationError{
+		return &domain.CreationError{
 			Entity: "UserProvider",
 		}
 	}
@@ -67,7 +66,7 @@ func (as AuthService) doUserCreationWithProvider(ctx context.Context, tx databas
 func (as AuthService) GenerateAuthURL() (*string, error) {
 	url, err := as.auth.GenerateAuthCodeURL()
 	if err != nil {
-		return nil, &domain.EntityCreationError{
+		return nil, &domain.CreationError{
 			Entity: "AuthCodeURL",
 		}
 	}
@@ -78,7 +77,9 @@ func (as AuthService) GenerateAuthURL() (*string, error) {
 func (as AuthService) SignUp(input domain.OAuthSignUpInput) (*string, error) {
 	data, err := as.exchangeMetaDataByCode(input.Code)
 	if err != nil {
-		return nil, err
+		return nil, &domain.AuthorizationError{
+			Message: err.Error(),
+		}
 	}
 
 	ctx := context.Background()
@@ -86,7 +87,10 @@ func (as AuthService) SignUp(input domain.OAuthSignUpInput) (*string, error) {
 		return as.doUserCreationWithProvider(ctx, tx, data)
 	})
 	if err != nil {
-		return nil, err
+		return nil, &domain.CreationError{
+			Entity:  "User",
+			Message: err.Error(),
+		}
 	}
 
 	return &data.AccessToken, nil

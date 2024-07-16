@@ -42,16 +42,12 @@ func (ac AuthController) SignIn(c *gin.Context) {
 	request := request.SignInRequest{}
 
 	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
+		c.Error(err)
 		return
 	}
 
 	if err := ac.v.Validate.Struct(request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
+		c.Error(err)
 		return
 	}
 
@@ -61,9 +57,7 @@ func (ac AuthController) SignIn(c *gin.Context) {
 
 	token, err := ac.as.SignIn(input)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Sign in failed.",
-		})
+		c.Error(err)
 		return
 	}
 
