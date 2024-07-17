@@ -20,9 +20,6 @@
     },
     "formatting.gofumpt": true,
     "ui.completion.usePlaceholders": true,
-    "ui.diagnostic.analyses": {
-      "unusedparams": true
-    },
     "ui.semanticTokens": true,
     "completionDocumentation": true
   },
