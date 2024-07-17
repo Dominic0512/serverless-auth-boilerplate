@@ -18,6 +18,7 @@ import (
 	"github.com/Dominic0512/serverless-auth-boilerplate/pkg/validate"
 	"github.com/Dominic0512/serverless-auth-boilerplate/repository"
 	"github.com/Dominic0512/serverless-auth-boilerplate/route"
+	"github.com/Dominic0512/serverless-auth-boilerplate/route/middleware"
 	"github.com/Dominic0512/serverless-auth-boilerplate/service"
 )
 
@@ -29,7 +30,9 @@ import (
 
 func InitializeApp() (*app.App, error) {
 	engine := framework.NewGinFramework()
-	baseRoute := route.NewBaseRoute(engine)
+	authMiddleware := middleware.NewAuthMiddleware()
+	errorHandlingMiddleware := middleware.NewErrorHandlingMiddleware()
+	baseRoute := route.NewBaseRoute(engine, authMiddleware, errorHandlingMiddleware)
 	configConfig, err := config.NewConfig()
 	if err != nil {
 		return nil, err
@@ -45,7 +48,7 @@ func InitializeApp() (*app.App, error) {
 	userService := service.NewUserService(entTxHelper, userRepository, userProviderRepository, bcryptPasswordHelper)
 	validator := validate.NewValidator()
 	userController := controller.NewUserController(userService, validator)
-	userRoute := route.NewUserRoute(engine, userController)
+	userRoute := route.NewUserRoute(engine, authMiddleware, userController)
 	routes := router.NewRouter(baseRoute, userRoute)
 	ginRunner := runner.NewGinRunner(engine)
 	appApp, err := app.NewApp(routes, ginRunner)

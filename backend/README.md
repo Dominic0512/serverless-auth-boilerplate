@@ -30,6 +30,7 @@ example:
 ```shell
 docker compose -f ./docker/docker-compose.yml up -d
 ```
+> Currently, we use `CompileDaemon` for hot reload, but if there are changes relate to ORM/DI, we should manually generate the scripts.
 
 
 # Todo

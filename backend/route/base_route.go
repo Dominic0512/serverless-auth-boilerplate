@@ -42,7 +42,7 @@ func (br BaseRoute) Setup() {
 		})
 	})
 
-	br.RegisterBeforeMiddlewares(br.authMiddleware.OAuthTokenGuard)
+	// br.RegisterBeforeMiddlewares(br.authMiddleware.OAuthTokenGuard)
 	br.RegisterAfterMiddlewares(br.errorHandlingMiddleware.ErrorHandler)
 }
 
