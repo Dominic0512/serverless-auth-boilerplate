@@ -32,6 +32,7 @@ func (ehm ErrorHandlingMiddleware) ErrorHandler(c *gin.Context) {
 		default:
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 		}
+		return
 	}
 
 	c.JSON(http.StatusServiceUnavailable, gin.H{"error": "Service Unavailable Error"})

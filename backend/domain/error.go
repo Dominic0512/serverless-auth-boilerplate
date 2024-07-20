@@ -15,7 +15,7 @@ type CreationError struct {
 }
 
 func (e CreationError) Error() string {
-	return fmt.Sprintf("Failed to create %s", e.Entity)
+	return fmt.Sprintf("Failed to create %s: %s", e.Entity, e.Message)
 }
 
 func (e CreationError) DomainError() {}

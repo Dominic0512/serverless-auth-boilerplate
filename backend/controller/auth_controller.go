@@ -54,7 +54,6 @@ func (ac AuthController) SignIn(c *gin.Context) {
 	input := domain.OAuthSignInInput{
 		Code: request.Code,
 	}
-
 	token, err := ac.as.SignIn(input)
 	if err != nil {
 		c.Error(err)
@@ -70,28 +69,21 @@ func (ac AuthController) SignUp(c *gin.Context) {
 	request := request.SignUpRequest{}
 
 	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
+		c.Error(err)
 		return
 	}
 
 	if err := ac.v.Validate.Struct(request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
+		c.Error(err)
 		return
 	}
 
 	input := domain.OAuthSignUpInput{
 		Code: request.Code,
 	}
-
 	token, err := ac.as.SignUp(input)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Create user failed.",
-		})
+		c.Error(err)
 		return
 	}
 

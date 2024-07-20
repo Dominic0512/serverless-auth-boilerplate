@@ -48,7 +48,7 @@ func (auth *Auth0Authenticator) ExchangeMetaDataByCode(code string) (*AuthMetaDa
 	if !ok {
 		return nil, fmt.Errorf("can not extract the id token from oauth2 token")
 	}
-	fmt.Println(rawIDToken)
+
 	idToken, err := auth.Verify(context.Background(), rawIDToken)
 	if err != nil {
 		return nil, err

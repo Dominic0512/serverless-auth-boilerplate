@@ -43,7 +43,8 @@ func (as AuthService) doUserCreationWithProvider(ctx context.Context, tx databas
 	user, err := as.userRepo.Create(ctx, tx, userProps)
 	if err != nil {
 		return &domain.CreationError{
-			Entity: "User",
+			Entity:  "User",
+			Message: err.Error(),
 		}
 	}
 
@@ -77,9 +78,7 @@ func (as AuthService) GenerateAuthURL() (*string, error) {
 func (as AuthService) SignUp(input domain.OAuthSignUpInput) (*string, error) {
 	data, err := as.exchangeMetaDataByCode(input.Code)
 	if err != nil {
-		return nil, &domain.AuthorizationError{
-			Message: err.Error(),
-		}
+		return nil, err
 	}
 
 	ctx := context.Background()
