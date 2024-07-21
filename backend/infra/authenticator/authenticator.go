@@ -10,11 +10,13 @@ type AuthMetaData struct {
 	EmailVerified bool
 	Picture       string
 	Sub           string
+	Provider      string
 }
 
 type Authenticator interface {
 	GenerateAuthCodeURL() (string, error)
 	ExchangeMetaDataByCode(code string) (*AuthMetaData, error)
+	TransformProviderName(name string) (*string, error)
 }
 
 var ProviderSet = wire.NewSet(

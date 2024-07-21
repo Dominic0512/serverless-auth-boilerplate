@@ -36,5 +36,5 @@ docker compose -f ./docker/docker-compose.yml up -d
 # Todo
 - [x] User Provider Table
 - [ ] Primary JWT token and refresh token
-- [ ] Facebook provider
-- [ ] Google provider
+- [x] Facebook provider
+- [x] Google provider

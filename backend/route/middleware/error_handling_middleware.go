@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/Dominic0512/serverless-auth-boilerplate/domain"
@@ -15,7 +16,7 @@ func (ehm ErrorHandlingMiddleware) ErrorHandler(c *gin.Context) {
 	if lastErr == nil {
 		return
 	}
-
+	fmt.Println(lastErr)
 	var domainErr domain.DomainError
 	if errors.As(lastErr.Err, &domainErr) {
 		switch e := lastErr.Err.(type) {

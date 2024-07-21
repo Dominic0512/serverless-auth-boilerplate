@@ -48,14 +48,6 @@ func (upc *UserProviderCreate) SetName(u userprovider.Name) *UserProviderCreate 
 	return upc
 }
 
-// SetNillableName sets the "name" field if the given value is not nil.
-func (upc *UserProviderCreate) SetNillableName(u *userprovider.Name) *UserProviderCreate {
-	if u != nil {
-		upc.SetName(*u)
-	}
-	return upc
-}
-
 // SetCreatedAt sets the "createdAt" field.
 func (upc *UserProviderCreate) SetCreatedAt(t time.Time) *UserProviderCreate {
 	upc.mutation.SetCreatedAt(t)
@@ -124,10 +116,6 @@ func (upc *UserProviderCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (upc *UserProviderCreate) defaults() {
-	if _, ok := upc.mutation.Name(); !ok {
-		v := userprovider.DefaultName
-		upc.mutation.SetName(v)
-	}
 	if _, ok := upc.mutation.CreatedAt(); !ok {
 		v := userprovider.DefaultCreatedAt()
 		upc.mutation.SetCreatedAt(v)

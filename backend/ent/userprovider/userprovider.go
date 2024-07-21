@@ -70,12 +70,10 @@ var (
 // Name defines the type for the "name" enum field.
 type Name string
 
-// NamePrimary is the default value of the Name enum.
-const DefaultName = NamePrimary
-
 // Name values.
 const (
-	NamePrimary  Name = "PPIMARY"
+	NamePrimary  Name = "PRIMARY"
+	NameAuth0    Name = "AUTH0"
 	NameFacebook Name = "FACEBOOK"
 	NameGoogle   Name = "GOOGLE"
 )
@@ -87,7 +85,7 @@ func (n Name) String() string {
 // NameValidator is a validator for the "name" field enum values. It is called by the builders before save.
 func NameValidator(n Name) error {
 	switch n {
-	case NamePrimary, NameFacebook, NameGoogle:
+	case NamePrimary, NameAuth0, NameFacebook, NameGoogle:
 		return nil
 	default:
 		return fmt.Errorf("userprovider: invalid enum value for name field: %q", n)

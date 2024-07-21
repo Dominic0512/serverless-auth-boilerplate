@@ -22,10 +22,11 @@ func (UserProvider) Fields() []ent.Field {
 		field.String("picture").Optional(),
 		field.Enum("name").
 			NamedValues(
-				"Primary", "PPIMARY",
+				"Primary", "PRIMARY",
+				"Auth0", "AUTH0",
 				"Facebook", "FACEBOOK",
 				"Google", "GOOGLE",
-			).Default("PPIMARY"),
+			),
 		field.Time("createdAt").Default(time.Now),
 		field.Time("updatedAt").Default(time.Now).UpdateDefault(time.Now),
 	}

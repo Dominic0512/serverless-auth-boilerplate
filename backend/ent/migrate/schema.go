@@ -28,7 +28,7 @@ var (
 	UserProvidersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "picture", Type: field.TypeString, Nullable: true},
-		{Name: "name", Type: field.TypeEnum, Enums: []string{"PPIMARY", "FACEBOOK", "GOOGLE"}, Default: "PPIMARY"},
+		{Name: "name", Type: field.TypeEnum, Enums: []string{"PRIMARY", "AUTH0", "FACEBOOK", "GOOGLE"}},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "user_id", Type: field.TypeUUID},

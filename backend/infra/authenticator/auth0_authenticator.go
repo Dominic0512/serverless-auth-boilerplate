@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
+	"strings"
 
 	"github.com/Dominic0512/serverless-auth-boilerplate/infra/config"
 	"github.com/coreos/go-oidc/v3/oidc"
@@ -17,6 +18,12 @@ type Auth0Authenticator struct {
 	oauth2.Config
 }
 
+var Auth0ProviderMap = map[string]string{
+	"auth0":         "AUTH0",
+	"facebook":      "FACEBOOK",
+	"google-oauth2": "GOOGLE",
+}
+
 func generateRandomState() (string, error) {
 	bytes := make([]byte, 32)
 	_, err := rand.Read(bytes)
@@ -27,6 +34,15 @@ func generateRandomState() (string, error) {
 	state := base64.StdEncoding.EncodeToString(bytes)
 
 	return state, nil
+}
+
+func (auth *Auth0Authenticator) TransformProviderName(name string) (*string, error) {
+	value, ok := Auth0ProviderMap[name]
+	if !ok {
+		return nil, fmt.Errorf("provider name %s is not supported", name)
+	}
+
+	return &value, nil
 }
 
 func (auth *Auth0Authenticator) GenerateAuthCodeURL() (string, error) {
@@ -65,12 +81,18 @@ func (auth *Auth0Authenticator) ExchangeMetaDataByCode(code string) (*AuthMetaDa
 		return nil, err
 	}
 
+	providerName, err := auth.TransformProviderName(strings.Split(claims.Sub, "|")[0])
+	if err != nil {
+		return nil, err
+	}
+
 	return &AuthMetaData{
 		AccessToken:   oauth2Token.AccessToken,
 		Email:         claims.Email,
 		EmailVerified: claims.Verified,
 		Picture:       claims.Picture,
 		Sub:           claims.Sub,
+		Provider:      *providerName,
 	}, nil
 }
 

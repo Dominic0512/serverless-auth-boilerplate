@@ -12,10 +12,6 @@ type UserEntity = ent.User
 
 type UserClient = ent.UserClient
 
-type User struct {
-	Email string
-}
-
 type CreateUserWithoutPasswordInput struct {
 	Email string
 }

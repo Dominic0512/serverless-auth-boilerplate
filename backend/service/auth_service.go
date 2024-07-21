@@ -49,7 +49,7 @@ func (as AuthService) doUserCreationWithProvider(ctx context.Context, tx databas
 	}
 
 	userProviderProps := domain.UserProviderEntity{
-		Name:   domain.UserProviderNamePrimary,
+		Name:   domain.UserProviderName(data.Provider),
 		UserID: user.ID,
 	}
 
@@ -57,7 +57,8 @@ func (as AuthService) doUserCreationWithProvider(ctx context.Context, tx databas
 	_, err = as.userProviderRepo.Create(ctx, tx, userProviderProps)
 	if err != nil {
 		return &domain.CreationError{
-			Entity: "UserProvider",
+			Entity:  "UserProvider",
+			Message: err.Error(),
 		}
 	}
 
@@ -68,7 +69,8 @@ func (as AuthService) GenerateAuthURL() (*string, error) {
 	url, err := as.auth.GenerateAuthCodeURL()
 	if err != nil {
 		return nil, &domain.CreationError{
-			Entity: "AuthCodeURL",
+			Entity:  "AuthCodeURL",
+			Message: err.Error(),
 		}
 	}
 
