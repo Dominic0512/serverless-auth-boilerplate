@@ -20,13 +20,13 @@ type AuthService struct {
 func (as AuthService) exchangeMetaDataByCode(code string) (*authenticator.AuthMetaData, error) {
 	data, err := as.auth.ExchangeMetaDataByCode(code)
 	if err != nil {
-		return nil, domain.AuthorizationError{
+		return nil, &domain.AuthorizationError{
 			Message: err.Error(),
 		}
 	}
 
 	if !data.EmailVerified {
-		return nil, domain.InvalidError{
+		return nil, &domain.InvalidError{
 			Entity:  "Email",
 			Message: "Email is not verified",
 		}
@@ -88,10 +88,7 @@ func (as AuthService) SignUp(input domain.OAuthSignUpInput) (*string, error) {
 		return as.doUserCreationWithProvider(ctx, tx, data)
 	})
 	if err != nil {
-		return nil, &domain.CreationError{
-			Entity:  "User",
-			Message: err.Error(),
-		}
+		return nil, err
 	}
 
 	return &data.AccessToken, nil

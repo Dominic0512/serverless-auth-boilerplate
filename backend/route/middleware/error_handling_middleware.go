@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/Dominic0512/serverless-auth-boilerplate/domain"
@@ -16,19 +15,19 @@ func (ehm ErrorHandlingMiddleware) ErrorHandler(c *gin.Context) {
 	if lastErr == nil {
 		return
 	}
-	fmt.Println(lastErr)
+
 	var domainErr domain.DomainError
 	if errors.As(lastErr.Err, &domainErr) {
 		switch e := lastErr.Err.(type) {
-		case domain.InvalidError:
+		case *domain.InvalidError:
 			c.JSON(http.StatusBadRequest, gin.H{"message": e.Error()})
-		case domain.CreationError:
+		case *domain.CreationError:
 			c.JSON(http.StatusBadRequest, gin.H{"message": e.Error()})
-		case domain.ValidationError:
+		case *domain.ValidationError:
 			c.JSON(http.StatusBadRequest, gin.H{"message": e.Error()})
-		case domain.AuthorizationError:
+		case *domain.AuthorizationError:
 			c.JSON(http.StatusUnauthorized, gin.H{"message": e.Error()})
-		case domain.NotFoundError:
+		case *domain.NotFoundError:
 			c.JSON(http.StatusNotFound, gin.H{"message": e.Error()})
 		default:
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})

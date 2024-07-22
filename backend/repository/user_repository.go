@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/Dominic0512/serverless-auth-boilerplate/domain"
 	"github.com/Dominic0512/serverless-auth-boilerplate/ent/user"
@@ -17,7 +16,7 @@ type UserRepository struct {
 func (ur UserRepository) Find(ctx context.Context) ([]*domain.UserEntity, error) {
 	user, err := ur.User.Query().All(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed to query all user: %w", err)
+		return nil, err
 	}
 	return user, nil
 }
@@ -25,7 +24,7 @@ func (ur UserRepository) Find(ctx context.Context) ([]*domain.UserEntity, error)
 func (ur UserRepository) FindOne(ctx context.Context, id uuid.UUID) (*domain.UserEntity, error) {
 	user, err := ur.User.Query().Where(user.ID(id)).Only(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed to query single user: %w", err)
+		return nil, err
 	}
 
 	return user, nil
@@ -34,7 +33,7 @@ func (ur UserRepository) FindOne(ctx context.Context, id uuid.UUID) (*domain.Use
 func (ur UserRepository) FindOneByEmail(ctx context.Context, email string) (*domain.UserEntity, error) {
 	user, err := ur.User.Query().Where(user.Email(email)).Only(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed to query single user: %w", err)
+		return nil, err
 	}
 
 	return user, nil
@@ -57,7 +56,7 @@ func (ur UserRepository) Create(ctx context.Context, tx database.Tx, properties 
 
 	user, err := mutate.Save(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create user: %w", err)
+		return nil, err
 	}
 
 	return user, nil
@@ -68,8 +67,7 @@ func (ur UserRepository) Update(ctx context.Context, id uuid.UUID, properties do
 		SetName(properties.Name).
 		Save(ctx)
 	if err != nil {
-		fmt.Println(err)
-		return nil, fmt.Errorf("failed to update user: %w", err)
+		return nil, err
 	}
 
 	return user, nil
@@ -78,7 +76,7 @@ func (ur UserRepository) Update(ctx context.Context, id uuid.UUID, properties do
 func (ur UserRepository) Delete(ctx context.Context, id uuid.UUID) error {
 	err := ur.User.DeleteOneID(id).Exec(ctx)
 	if err != nil {
-		return fmt.Errorf("failed to delete user: %w", err)
+		return err
 	}
 
 	return nil

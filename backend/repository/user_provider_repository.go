@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/Dominic0512/serverless-auth-boilerplate/domain"
 	"github.com/Dominic0512/serverless-auth-boilerplate/infra/database"
@@ -25,7 +24,7 @@ func (upr UserProviderRepository) Create(ctx context.Context, tx database.Tx, pr
 
 	userProvider, err := mutate.Save(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create user provider: %w", err)
+		return nil, err
 	}
 
 	return userProvider, nil
