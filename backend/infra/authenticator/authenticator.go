@@ -2,10 +2,11 @@ package authenticator
 
 import (
 	"github.com/google/wire"
+	"golang.org/x/oauth2"
 )
 
 type AuthMetaData struct {
-	AccessToken   string
+	Token         *oauth2.Token
 	Email         string
 	EmailVerified bool
 	Picture       string

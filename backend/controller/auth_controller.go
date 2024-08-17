@@ -61,7 +61,8 @@ func (ac AuthController) SignIn(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusAccepted, gin.H{
-		"token": token,
+		"token":      token.AccessToken,
+		"token_type": token.TokenType,
 	})
 }
 
@@ -88,6 +89,7 @@ func (ac AuthController) SignUp(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusAccepted, gin.H{
-		"token": token,
+		"token":      token.AccessToken,
+		"token_type": token.TokenType,
 	})
 }

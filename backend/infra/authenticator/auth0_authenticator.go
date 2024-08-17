@@ -87,7 +87,7 @@ func (auth *Auth0Authenticator) ExchangeMetaDataByCode(code string) (*AuthMetaDa
 	}
 
 	return &AuthMetaData{
-		AccessToken:   oauth2Token.AccessToken,
+		Token:         oauth2Token,
 		Email:         claims.Email,
 		EmailVerified: claims.Verified,
 		Picture:       claims.Picture,

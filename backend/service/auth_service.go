@@ -8,6 +8,7 @@ import (
 	"github.com/Dominic0512/serverless-auth-boilerplate/infra/authenticator"
 	"github.com/Dominic0512/serverless-auth-boilerplate/infra/database"
 	"github.com/Dominic0512/serverless-auth-boilerplate/pkg/helper"
+	"golang.org/x/oauth2"
 )
 
 type AuthService struct {
@@ -77,7 +78,7 @@ func (as AuthService) GenerateAuthURL() (*string, error) {
 	return &url, nil
 }
 
-func (as AuthService) SignUp(input domain.OAuthSignUpInput) (*string, error) {
+func (as AuthService) SignUp(input domain.OAuthSignUpInput) (*oauth2.Token, error) {
 	data, err := as.exchangeMetaDataByCode(input.Code)
 	if err != nil {
 		return nil, err
@@ -91,10 +92,10 @@ func (as AuthService) SignUp(input domain.OAuthSignUpInput) (*string, error) {
 		return nil, err
 	}
 
-	return &data.AccessToken, nil
+	return data.Token, nil
 }
 
-func (as AuthService) SignIn(input domain.OAuthSignInInput) (*string, error) {
+func (as AuthService) SignIn(input domain.OAuthSignInInput) (*oauth2.Token, error) {
 	data, err := as.exchangeMetaDataByCode(input.Code)
 	if err != nil {
 		return nil, err
@@ -108,7 +109,7 @@ func (as AuthService) SignIn(input domain.OAuthSignInInput) (*string, error) {
 		}
 	}
 
-	return &data.AccessToken, nil
+	return data.Token, nil
 }
 
 func NewAuthService(
