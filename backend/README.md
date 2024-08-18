@@ -34,7 +34,5 @@ docker compose -f ./docker/docker-compose.yml up -d
 
 
 # Todo
-- [x] User Provider Table
-- [ ] Primary JWT token and refresh token
-- [x] Facebook provider
-- [x] Google provider
+- [ ] Integrate gin-swagger 
+- [ ] Implement deployment by Terraform
