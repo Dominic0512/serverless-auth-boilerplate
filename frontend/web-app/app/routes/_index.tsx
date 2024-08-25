@@ -1,48 +1,26 @@
 import type { MetaFunction } from "@remix-run/node";
+import { useAuth0 } from "@auth0/auth0-react";
+
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "New Remix App" },
-    { name: "description", content: "Welcome to Remix!" },
+    { title: "Serverless Auth Boilerplate" },
+    { name: "description", content: "This is Serverless Auth Boilerplate." },
   ];
 };
 
 export default function Index() {
+  const { loginWithRedirect } = useAuth0();
   return (
     <div className="font-sans p-4">
-      <h1 className="text-3xl">Welcome to Remix</h1>
-      <ul className="list-disc mt-4 pl-6 space-y-2">
-        <li>
-          <a
-            className="text-blue-700 underline visited:text-purple-900"
-            target="_blank"
-            href="https://remix.run/start/quickstart"
-            rel="noreferrer"
-          >
-            5m Quick Start
-          </a>
-        </li>
-        <li>
-          <a
-            className="text-blue-700 underline visited:text-purple-900"
-            target="_blank"
-            href="https://remix.run/start/tutorial"
-            rel="noreferrer"
-          >
-            30m Tutorial
-          </a>
-        </li>
-        <li>
-          <a
-            className="text-blue-700 underline visited:text-purple-900"
-            target="_blank"
-            href="https://remix.run/docs"
-            rel="noreferrer"
-          >
-            Remix Docs
-          </a>
-        </li>
-      </ul>
+      <div className="w-100 h-100 flex flex-col items-center justify-center gap-4">
+        <div>
+          <h1 className="text-3xl">Welcome to Serverless Auth Boilerplate</h1>
+        </div>
+        <div>
+          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={() => loginWithRedirect() }>Login By Auth0</button>
+        </div>     
+      </div>  
     </div>
   );
 }
