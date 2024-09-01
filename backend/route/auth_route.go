@@ -1,13 +1,13 @@
 package route
 
 import (
-	"github.com/Dominic0512/serverless-auth-boilerplate/controller"
+	"github.com/Dominic0512/serverless-auth-boilerplate/controller/auth"
 	"github.com/gin-gonic/gin"
 )
 
 type AuthRoute struct {
 	router         *gin.Engine
-	authController controller.AuthController
+	authController auth.AuthController
 }
 
 func (ar AuthRoute) Setup() {
@@ -21,7 +21,7 @@ func (ar AuthRoute) Setup() {
 
 func NewAuthRoute(
 	router *gin.Engine,
-	authController controller.AuthController,
+	authController auth.AuthController,
 ) AuthRoute {
 	return AuthRoute{
 		router:         router,

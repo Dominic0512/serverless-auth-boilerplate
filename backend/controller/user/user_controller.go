@@ -1,10 +1,9 @@
-package controller
+package user
 
 import (
 	"fmt"
 	"net/http"
 
-	"github.com/Dominic0512/serverless-auth-boilerplate/controller/request"
 	"github.com/Dominic0512/serverless-auth-boilerplate/domain"
 	"github.com/Dominic0512/serverless-auth-boilerplate/pkg/validate"
 	"github.com/Dominic0512/serverless-auth-boilerplate/service"
@@ -20,6 +19,15 @@ func NewUserController(us service.UserService, v *validate.Validator) UserContro
 	return UserController{us, v}
 }
 
+// List godoc
+// @Summary List users
+// @Schemes http
+// @Description List users
+// @Tags User
+// @Accept json
+// @Produce json
+// @Success 200 {object} UsersResponse "ok"
+// @Router / [get]
 func (uc UserController) List(c *gin.Context) {
 	users, err := uc.us.Find()
 	if err != nil {
@@ -34,8 +42,17 @@ func (uc UserController) List(c *gin.Context) {
 	})
 }
 
+// Create godoc
+// @Summary Create user
+// @Schemes http
+// @Description Create user
+// @Tags User
+// @Accept json
+// @Produce json
+// @Success 200 {object} UserResponse "ok"
+// @Router / [post]
 func (uc UserController) Create(c *gin.Context) {
-	request := request.CreateUserRequest{}
+	request := CreateUserRequest{}
 
 	if err := c.ShouldBindJSON(&request); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -63,14 +80,25 @@ func (uc UserController) Create(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusAccepted, gin.H{
-		"message": "Create user successfully",
-		"user":    user,
-	})
+	c.JSON(http.StatusAccepted, UserResponse{User: User{
+		ID:    user.ID,
+		Email: user.Email,
+		Name:  user.Name,
+	}})
 }
 
+// GetById godoc
+// @Summary Get user by id
+// @Schemes http
+// @Description Get user by id
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param id path string true "User ID"
+// @Success 200 {object} UserResponse "ok"
+// @Router /{id} [get]
 func (uc UserController) GetById(c *gin.Context) {
-	uri := request.ManipulateUri{}
+	uri := ManipulateUri{}
 
 	if err := c.ShouldBindUri(&uri); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -94,14 +122,25 @@ func (uc UserController) GetById(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, gin.H{
-		"message": "Get user by id successfully",
-		"user":    user,
-	})
+	c.JSON(http.StatusAccepted, UserResponse{User: User{
+		ID:    user.ID,
+		Email: user.Email,
+		Name:  user.Name,
+	}})
 }
 
+// Update godoc
+// @Summary Update user
+// @Schemes http
+// @Description Update user
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param id path string true "User ID"
+// @Success 200 {object} UserResponse "ok"
+// @Router /{id} [put]
 func (uc UserController) Update(c *gin.Context) {
-	uri := request.ManipulateUri{}
+	uri := ManipulateUri{}
 
 	if err := c.ShouldBindUri(&uri); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -110,7 +149,7 @@ func (uc UserController) Update(c *gin.Context) {
 		return
 	}
 
-	request := request.UpdateUserRequest{}
+	request := UpdateUserRequest{}
 
 	if err := c.ShouldBindJSON(&request); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -133,14 +172,25 @@ func (uc UserController) Update(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, gin.H{
-		"message": "Update user successfully",
-		"user":    user,
-	})
+	c.JSON(http.StatusAccepted, UserResponse{User: User{
+		ID:    user.ID,
+		Email: user.Email,
+		Name:  user.Name,
+	}})
 }
 
+// PartialUpdate godoc
+// @Summary Partial update user
+// @Schemes http
+// @Description Partial update user
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param id path string true "User ID"
+// @Success 200 {object} UserResponse "ok"
+// @Router /{id} [patch]
 func (uc UserController) PartialUpdate(c *gin.Context) {
-	uri := request.ManipulateUri{}
+	uri := ManipulateUri{}
 
 	if err := c.ShouldBindUri(&uri); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -149,7 +199,7 @@ func (uc UserController) PartialUpdate(c *gin.Context) {
 		return
 	}
 
-	request := request.UpdateUserRequest{}
+	request := UpdateUserRequest{}
 
 	if err := c.ShouldBindJSON(&request); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -170,14 +220,25 @@ func (uc UserController) PartialUpdate(c *gin.Context) {
 		})
 	}
 
-	c.JSON(200, gin.H{
-		"message": "Partial update user successfully",
-		"user":    user,
-	})
+	c.JSON(http.StatusAccepted, UserResponse{User: User{
+		ID:    user.ID,
+		Email: user.Email,
+		Name:  user.Name,
+	}})
 }
 
+// Delete godoc
+// @Summary Delete user
+// @Schemes http
+// @Description Delete user
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param id path string true "User ID"
+// @Success 200
+// @Router /{id} [delete]
 func (uc UserController) Delete(c *gin.Context) {
-	uri := request.ManipulateUri{}
+	uri := ManipulateUri{}
 
 	if err := c.ShouldBindUri(&uri); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -193,11 +254,9 @@ func (uc UserController) Delete(c *gin.Context) {
 	err := uc.us.Delete(input)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Partial update user failed.",
+			"message": "Delete user failed.",
 		})
 	}
 
-	c.JSON(200, gin.H{
-		"message": "Delete user successfully",
-	})
+	c.JSON(200, gin.H{})
 }

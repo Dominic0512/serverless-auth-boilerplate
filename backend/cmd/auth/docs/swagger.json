@@ -21,7 +21,7 @@
                     "200": {
                         "description": "ok",
                         "schema": {
-                            "$ref": "#/definitions/response.GenerateAuthURLResponse"
+                            "$ref": "#/definitions/auth.GenerateAuthURLResponse"
                         }
                     }
                 }
@@ -44,7 +44,7 @@
                     "200": {
                         "description": "ok",
                         "schema": {
-                            "$ref": "#/definitions/response.TokenResponse"
+                            "$ref": "#/definitions/auth.TokenResponse"
                         }
                     }
                 }
@@ -67,7 +67,7 @@
                     "200": {
                         "description": "ok",
                         "schema": {
-                            "$ref": "#/definitions/response.TokenResponse"
+                            "$ref": "#/definitions/auth.TokenResponse"
                         }
                     }
                 }
@@ -75,7 +75,7 @@
         }
     },
     "definitions": {
-        "response.GenerateAuthURLResponse": {
+        "auth.GenerateAuthURLResponse": {
             "type": "object",
             "properties": {
                 "url": {
@@ -83,7 +83,7 @@
                 }
             }
         },
-        "response.TokenResponse": {
+        "auth.TokenResponse": {
             "type": "object",
             "properties": {
                 "token": {

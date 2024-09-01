@@ -1,4 +1,4 @@
-package request
+package user
 
 type ManipulateUri struct {
 	ID string `uri:"id" validate:"required"`

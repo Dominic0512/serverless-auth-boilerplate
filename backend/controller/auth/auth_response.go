@@ -1,4 +1,4 @@
-package response
+package auth
 
 type GenerateAuthURLResponse struct {
 	Url *string `json:"url"`

@@ -32,7 +32,7 @@ const docTemplate = `{
                     "200": {
                         "description": "ok",
                         "schema": {
-                            "$ref": "#/definitions/response.GenerateAuthURLResponse"
+                            "$ref": "#/definitions/auth.GenerateAuthURLResponse"
                         }
                     }
                 }
@@ -55,7 +55,7 @@ const docTemplate = `{
                     "200": {
                         "description": "ok",
                         "schema": {
-                            "$ref": "#/definitions/response.TokenResponse"
+                            "$ref": "#/definitions/auth.TokenResponse"
                         }
                     }
                 }
@@ -78,7 +78,7 @@ const docTemplate = `{
                     "200": {
                         "description": "ok",
                         "schema": {
-                            "$ref": "#/definitions/response.TokenResponse"
+                            "$ref": "#/definitions/auth.TokenResponse"
                         }
                     }
                 }
@@ -86,7 +86,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "response.GenerateAuthURLResponse": {
+        "auth.GenerateAuthURLResponse": {
             "type": "object",
             "properties": {
                 "url": {
@@ -94,7 +94,7 @@ const docTemplate = `{
                 }
             }
         },
-        "response.TokenResponse": {
+        "auth.TokenResponse": {
             "type": "object",
             "properties": {
                 "token": {

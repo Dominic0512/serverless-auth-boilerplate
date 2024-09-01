@@ -1,10 +1,8 @@
-package controller
+package auth
 
 import (
 	"net/http"
 
-	"github.com/Dominic0512/serverless-auth-boilerplate/controller/request"
-	"github.com/Dominic0512/serverless-auth-boilerplate/controller/response"
 	"github.com/Dominic0512/serverless-auth-boilerplate/domain"
 	"github.com/Dominic0512/serverless-auth-boilerplate/pkg/validate"
 	"github.com/Dominic0512/serverless-auth-boilerplate/service"
@@ -32,7 +30,7 @@ func NewAuthController(
 // @Tags Auth
 // @Accept json
 // @Produce json
-// @Success 200 {object} response.GenerateAuthURLResponse "ok"
+// @Success 200 {object} GenerateAuthURLResponse "ok"
 // @Router /oauth-url [get]
 func (ac AuthController) GenerateAuthURL(c *gin.Context) {
 	url, err := ac.as.GenerateAuthURL()
@@ -43,7 +41,7 @@ func (ac AuthController) GenerateAuthURL(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, response.GenerateAuthURLResponse{
+	c.JSON(200, GenerateAuthURLResponse{
 		Url: url,
 	})
 }
@@ -55,10 +53,10 @@ func (ac AuthController) GenerateAuthURL(c *gin.Context) {
 // @Tags Auth
 // @Accept json
 // @Produce json
-// @Success 200 {object} response.TokenResponse "ok"
+// @Success 200 {object} TokenResponse "ok"
 // @Router /sign-in [post]
 func (ac AuthController) SignIn(c *gin.Context) {
-	request := request.SignInRequest{}
+	request := SignInRequest{}
 
 	if err := c.ShouldBindJSON(&request); err != nil {
 		c.Error(err)
@@ -79,7 +77,7 @@ func (ac AuthController) SignIn(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusAccepted, response.TokenResponse{
+	c.JSON(http.StatusAccepted, TokenResponse{
 		Token:      token.AccessToken,
 		Token_type: token.TokenType,
 	})
@@ -92,10 +90,10 @@ func (ac AuthController) SignIn(c *gin.Context) {
 // @Tags Auth
 // @Accept json
 // @Produce json
-// @Success 200 {object} response.TokenResponse "ok"
+// @Success 200 {object} TokenResponse "ok"
 // @Router /sign-up [post]
 func (ac AuthController) SignUp(c *gin.Context) {
-	request := request.SignUpRequest{}
+	request := SignUpRequest{}
 
 	if err := c.ShouldBindJSON(&request); err != nil {
 		c.Error(err)
@@ -116,7 +114,7 @@ func (ac AuthController) SignUp(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusAccepted, response.TokenResponse{
+	c.JSON(http.StatusAccepted, TokenResponse{
 		Token:      token.AccessToken,
 		Token_type: token.TokenType,
 	})

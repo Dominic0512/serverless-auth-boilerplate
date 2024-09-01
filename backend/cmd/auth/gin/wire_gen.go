@@ -9,7 +9,7 @@ package main
 import (
 	"github.com/Dominic0512/serverless-auth-boilerplate/cmd/auth/gin/app"
 	"github.com/Dominic0512/serverless-auth-boilerplate/cmd/auth/router"
-	"github.com/Dominic0512/serverless-auth-boilerplate/controller"
+	"github.com/Dominic0512/serverless-auth-boilerplate/controller/auth"
 	"github.com/Dominic0512/serverless-auth-boilerplate/infra/authenticator"
 	"github.com/Dominic0512/serverless-auth-boilerplate/infra/config"
 	"github.com/Dominic0512/serverless-auth-boilerplate/infra/database"
@@ -53,7 +53,7 @@ func InitializeApp() (*app.App, error) {
 	authService := service.NewAuthService(entTxHelper, userRepository, userProviderRepository, auth0Authenticator)
 	bcryptPasswordHelper := helper.NewBcryptPasswordHelper()
 	userService := service.NewUserService(entTxHelper, userRepository, userProviderRepository, bcryptPasswordHelper)
-	authController := controller.NewAuthController(validator, authService, userService)
+	authController := auth.NewAuthController(validator, authService, userService)
 	authRoute := route.NewAuthRoute(engine, authController)
 	routes := router.NewRouter(baseRoute, authRoute)
 	ginRunner := runner.NewGinRunner(engine)

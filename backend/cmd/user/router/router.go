@@ -1,6 +1,7 @@
 package router
 
 import (
+	"github.com/Dominic0512/serverless-auth-boilerplate/cmd/user/docs"
 	"github.com/Dominic0512/serverless-auth-boilerplate/route"
 	"github.com/google/wire"
 )
@@ -22,6 +23,7 @@ func NewRouter(
 }
 
 func (r Routes) Setup() {
+	docs.SwaggerInfo.BasePath = "/api/users"
 	for _, route := range r {
 		route.Setup()
 	}

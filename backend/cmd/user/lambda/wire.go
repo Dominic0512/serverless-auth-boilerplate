@@ -11,9 +11,11 @@ import (
 	"github.com/Dominic0512/serverless-auth-boilerplate/infra/database"
 	"github.com/Dominic0512/serverless-auth-boilerplate/infra/framework"
 	"github.com/Dominic0512/serverless-auth-boilerplate/infra/runner"
+	"github.com/Dominic0512/serverless-auth-boilerplate/pkg/helper"
 	"github.com/Dominic0512/serverless-auth-boilerplate/pkg/validate"
 	"github.com/Dominic0512/serverless-auth-boilerplate/repository"
 	"github.com/Dominic0512/serverless-auth-boilerplate/route"
+	"github.com/Dominic0512/serverless-auth-boilerplate/route/middleware"
 	"github.com/Dominic0512/serverless-auth-boilerplate/service"
 	"github.com/google/wire"
 )
@@ -28,8 +30,10 @@ func InitializeApp() (*app.App, error) {
 		controller.ProviderSet,
 		route.ProviderSet,
 		validate.ProviderSet,
+		helper.ProviderSet,
 		runner.ProviderSet,
 		router.ProviderSet,
+		middleware.ProviderSet,
 		app.ProviderSet,
 	)
 	return &app.App{}, nil

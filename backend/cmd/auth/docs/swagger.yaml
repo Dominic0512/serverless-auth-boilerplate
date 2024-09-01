@@ -1,10 +1,10 @@
 definitions:
-  response.GenerateAuthURLResponse:
+  auth.GenerateAuthURLResponse:
     properties:
       url:
         type: string
     type: object
-  response.TokenResponse:
+  auth.TokenResponse:
     properties:
       token:
         type: string
@@ -27,7 +27,7 @@ paths:
         "200":
           description: ok
           schema:
-            $ref: '#/definitions/response.GenerateAuthURLResponse'
+            $ref: '#/definitions/auth.GenerateAuthURLResponse'
       summary: Generate oauth login url
       tags:
       - Auth
@@ -42,7 +42,7 @@ paths:
         "200":
           description: ok
           schema:
-            $ref: '#/definitions/response.TokenResponse'
+            $ref: '#/definitions/auth.TokenResponse'
       summary: SignIn with oauth code
       tags:
       - Auth
@@ -57,7 +57,7 @@ paths:
         "200":
           description: ok
           schema:
-            $ref: '#/definitions/response.TokenResponse'
+            $ref: '#/definitions/auth.TokenResponse'
       summary: SignUp with oauth code
       tags:
       - Auth
