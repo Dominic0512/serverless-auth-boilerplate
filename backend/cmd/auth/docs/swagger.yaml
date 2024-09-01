@@ -1,0 +1,64 @@
+definitions:
+  response.GenerateAuthURLResponse:
+    properties:
+      url:
+        type: string
+    type: object
+  response.TokenResponse:
+    properties:
+      token:
+        type: string
+      token_type:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /oauth-url:
+    get:
+      consumes:
+      - application/json
+      description: Currently, the authorization is integrated with Auth0. This endpoint
+        will generate an authorization URL for the client to redirect to the Auth0
+        login page.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            $ref: '#/definitions/response.GenerateAuthURLResponse'
+      summary: Generate oauth login url
+      tags:
+      - Auth
+  /sign-in:
+    post:
+      consumes:
+      - application/json
+      description: SignIn with oauth code
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            $ref: '#/definitions/response.TokenResponse'
+      summary: SignIn with oauth code
+      tags:
+      - Auth
+  /sign-up:
+    post:
+      consumes:
+      - application/json
+      description: SignUp with oauth code
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            $ref: '#/definitions/response.TokenResponse'
+      summary: SignUp with oauth code
+      tags:
+      - Auth
+swagger: "2.0"

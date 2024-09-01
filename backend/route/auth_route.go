@@ -11,7 +11,7 @@ type AuthRoute struct {
 }
 
 func (ar AuthRoute) Setup() {
-	auth := ar.router.Group("/api")
+	auth := ar.router.Group("/api/auth")
 	{
 		auth.GET("/oauth-url", ar.authController.GenerateAuthURL)
 		auth.POST("/sign-in", ar.authController.SignIn)

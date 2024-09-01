@@ -5,6 +5,8 @@ import (
 
 	"github.com/Dominic0512/serverless-auth-boilerplate/route/middleware"
 	"github.com/gin-gonic/gin"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type BaseRoute struct {
@@ -41,6 +43,8 @@ func (br BaseRoute) Setup() {
 			"message": "Alive...",
 		})
 	})
+
+	br.router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	// br.RegisterBeforeMiddlewares(br.authMiddleware.OAuthTokenGuard)
 	br.RegisterAfterMiddlewares(br.errorHandlingMiddleware.ErrorHandler)
