@@ -13,7 +13,7 @@ type UserRoute struct {
 }
 
 func (ur UserRoute) Setup() {
-	user := ur.router.Group("/api/users")
+	user := ur.router.Group("/api/v1/users")
 	user.Use(ur.authMiddleware.OAuthTokenGuard)
 	{
 		user.GET("", ur.userController.List)

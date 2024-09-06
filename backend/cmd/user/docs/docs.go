@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/": {
+        "/users": {
             "get": {
                 "description": "List users",
                 "consumes": [
@@ -28,6 +28,7 @@ const docTemplate = `{
                     "User"
                 ],
                 "summary": "List users",
+                "operationId": "ListUsers",
                 "responses": {
                     "200": {
                         "description": "ok",
@@ -49,6 +50,7 @@ const docTemplate = `{
                     "User"
                 ],
                 "summary": "Create user",
+                "operationId": "CreateUser",
                 "responses": {
                     "200": {
                         "description": "ok",
@@ -59,7 +61,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/{id}": {
+        "/users/{id}": {
             "get": {
                 "description": "Get user by id",
                 "consumes": [
@@ -72,6 +74,7 @@ const docTemplate = `{
                     "User"
                 ],
                 "summary": "Get user by id",
+                "operationId": "GetUser",
                 "parameters": [
                     {
                         "type": "string",
@@ -102,6 +105,7 @@ const docTemplate = `{
                     "User"
                 ],
                 "summary": "Update user",
+                "operationId": "UpdateUser",
                 "parameters": [
                     {
                         "type": "string",
@@ -132,6 +136,7 @@ const docTemplate = `{
                     "User"
                 ],
                 "summary": "Delete user",
+                "operationId": "DeleteUser",
                 "parameters": [
                     {
                         "type": "string",
@@ -159,6 +164,7 @@ const docTemplate = `{
                     "User"
                 ],
                 "summary": "Partial update user",
+                "operationId": "PartialUpdateUser",
                 "parameters": [
                     {
                         "type": "string",

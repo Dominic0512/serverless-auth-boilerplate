@@ -4,7 +4,7 @@
         "contact": {}
     },
     "paths": {
-        "/oauth-url": {
+        "/auth/oauth-url": {
             "get": {
                 "description": "Currently, the authorization is integrated with Auth0. This endpoint will generate an authorization URL for the client to redirect to the Auth0 login page.",
                 "consumes": [
@@ -17,6 +17,7 @@
                     "Auth"
                 ],
                 "summary": "Generate oauth login url",
+                "operationId": "GenerateAuthURL",
                 "responses": {
                     "200": {
                         "description": "ok",
@@ -27,7 +28,7 @@
                 }
             }
         },
-        "/sign-in": {
+        "/auth/sign-in": {
             "post": {
                 "description": "SignIn with oauth code",
                 "consumes": [
@@ -40,6 +41,7 @@
                     "Auth"
                 ],
                 "summary": "SignIn with oauth code",
+                "operationId": "SignIn",
                 "responses": {
                     "200": {
                         "description": "ok",
@@ -50,7 +52,7 @@
                 }
             }
         },
-        "/sign-up": {
+        "/auth/sign-up": {
             "post": {
                 "description": "SignUp with oauth code",
                 "consumes": [
@@ -63,6 +65,7 @@
                     "Auth"
                 ],
                 "summary": "SignUp with oauth code",
+                "operationId": "SignUp",
                 "responses": {
                     "200": {
                         "description": "ok",

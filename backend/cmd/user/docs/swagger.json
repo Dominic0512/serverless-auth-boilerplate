@@ -4,7 +4,7 @@
         "contact": {}
     },
     "paths": {
-        "/": {
+        "/users": {
             "get": {
                 "description": "List users",
                 "consumes": [
@@ -17,6 +17,7 @@
                     "User"
                 ],
                 "summary": "List users",
+                "operationId": "ListUsers",
                 "responses": {
                     "200": {
                         "description": "ok",
@@ -38,6 +39,7 @@
                     "User"
                 ],
                 "summary": "Create user",
+                "operationId": "CreateUser",
                 "responses": {
                     "200": {
                         "description": "ok",
@@ -48,7 +50,7 @@
                 }
             }
         },
-        "/{id}": {
+        "/users/{id}": {
             "get": {
                 "description": "Get user by id",
                 "consumes": [
@@ -61,6 +63,7 @@
                     "User"
                 ],
                 "summary": "Get user by id",
+                "operationId": "GetUser",
                 "parameters": [
                     {
                         "type": "string",
@@ -91,6 +94,7 @@
                     "User"
                 ],
                 "summary": "Update user",
+                "operationId": "UpdateUser",
                 "parameters": [
                     {
                         "type": "string",
@@ -121,6 +125,7 @@
                     "User"
                 ],
                 "summary": "Delete user",
+                "operationId": "DeleteUser",
                 "parameters": [
                     {
                         "type": "string",
@@ -148,6 +153,7 @@
                     "User"
                 ],
                 "summary": "Partial update user",
+                "operationId": "PartialUpdateUser",
                 "parameters": [
                     {
                         "type": "string",

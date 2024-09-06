@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/oauth-url": {
+        "/auth/oauth-url": {
             "get": {
                 "description": "Currently, the authorization is integrated with Auth0. This endpoint will generate an authorization URL for the client to redirect to the Auth0 login page.",
                 "consumes": [
@@ -28,6 +28,7 @@ const docTemplate = `{
                     "Auth"
                 ],
                 "summary": "Generate oauth login url",
+                "operationId": "GenerateAuthURL",
                 "responses": {
                     "200": {
                         "description": "ok",
@@ -38,7 +39,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/sign-in": {
+        "/auth/sign-in": {
             "post": {
                 "description": "SignIn with oauth code",
                 "consumes": [
@@ -51,6 +52,7 @@ const docTemplate = `{
                     "Auth"
                 ],
                 "summary": "SignIn with oauth code",
+                "operationId": "SignIn",
                 "responses": {
                     "200": {
                         "description": "ok",
@@ -61,7 +63,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/sign-up": {
+        "/auth/sign-up": {
             "post": {
                 "description": "SignUp with oauth code",
                 "consumes": [
@@ -74,6 +76,7 @@ const docTemplate = `{
                     "Auth"
                 ],
                 "summary": "SignUp with oauth code",
+                "operationId": "SignUp",
                 "responses": {
                     "200": {
                         "description": "ok",

@@ -24,6 +24,7 @@ func NewAuthController(
 }
 
 // GenerateAuthURL godoc
+// @Id GenerateAuthURL
 // @Summary Generate oauth login url
 // @Schemes http
 // @Description Currently, the authorization is integrated with Auth0. This endpoint will generate an authorization URL for the client to redirect to the Auth0 login page.
@@ -31,7 +32,7 @@ func NewAuthController(
 // @Accept json
 // @Produce json
 // @Success 200 {object} GenerateAuthURLResponse "ok"
-// @Router /oauth-url [get]
+// @Router /auth/oauth-url [get]
 func (ac AuthController) GenerateAuthURL(c *gin.Context) {
 	url, err := ac.as.GenerateAuthURL()
 	if err != nil {
@@ -47,6 +48,7 @@ func (ac AuthController) GenerateAuthURL(c *gin.Context) {
 }
 
 // SignIn godoc
+// @Id SignIn
 // @Summary SignIn with oauth code
 // @Schemes http
 // @Description SignIn with oauth code
@@ -54,7 +56,7 @@ func (ac AuthController) GenerateAuthURL(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Success 200 {object} TokenResponse "ok"
-// @Router /sign-in [post]
+// @Router /auth/sign-in [post]
 func (ac AuthController) SignIn(c *gin.Context) {
 	request := SignInRequest{}
 
@@ -84,6 +86,7 @@ func (ac AuthController) SignIn(c *gin.Context) {
 }
 
 // SignUp godoc
+// @Id SignUp
 // @Summary SignUp with oauth code
 // @Schemes http
 // @Description SignUp with oauth code
@@ -91,7 +94,7 @@ func (ac AuthController) SignIn(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Success 200 {object} TokenResponse "ok"
-// @Router /sign-up [post]
+// @Router /auth/sign-up [post]
 func (ac AuthController) SignUp(c *gin.Context) {
 	request := SignUpRequest{}
 

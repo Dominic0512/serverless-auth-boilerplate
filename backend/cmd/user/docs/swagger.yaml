@@ -23,11 +23,12 @@ definitions:
 info:
   contact: {}
 paths:
-  /:
+  /users:
     get:
       consumes:
       - application/json
       description: List users
+      operationId: ListUsers
       produces:
       - application/json
       responses:
@@ -42,6 +43,7 @@ paths:
       consumes:
       - application/json
       description: Create user
+      operationId: CreateUser
       produces:
       - application/json
       responses:
@@ -52,11 +54,12 @@ paths:
       summary: Create user
       tags:
       - User
-  /{id}:
+  /users/{id}:
     delete:
       consumes:
       - application/json
       description: Delete user
+      operationId: DeleteUser
       parameters:
       - description: User ID
         in: path
@@ -75,6 +78,7 @@ paths:
       consumes:
       - application/json
       description: Get user by id
+      operationId: GetUser
       parameters:
       - description: User ID
         in: path
@@ -95,6 +99,7 @@ paths:
       consumes:
       - application/json
       description: Partial update user
+      operationId: PartialUpdateUser
       parameters:
       - description: User ID
         in: path
@@ -115,6 +120,7 @@ paths:
       consumes:
       - application/json
       description: Update user
+      operationId: UpdateUser
       parameters:
       - description: User ID
         in: path

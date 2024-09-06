@@ -20,6 +20,7 @@ func NewUserController(us service.UserService, v *validate.Validator) UserContro
 }
 
 // List godoc
+// @Id ListUsers
 // @Summary List users
 // @Schemes http
 // @Description List users
@@ -27,7 +28,7 @@ func NewUserController(us service.UserService, v *validate.Validator) UserContro
 // @Accept json
 // @Produce json
 // @Success 200 {object} UsersResponse "ok"
-// @Router / [get]
+// @Router /users [get]
 func (uc UserController) List(c *gin.Context) {
 	users, err := uc.us.Find()
 	if err != nil {
@@ -43,6 +44,7 @@ func (uc UserController) List(c *gin.Context) {
 }
 
 // Create godoc
+// @Id CreateUser
 // @Summary Create user
 // @Schemes http
 // @Description Create user
@@ -50,7 +52,7 @@ func (uc UserController) List(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Success 200 {object} UserResponse "ok"
-// @Router / [post]
+// @Router /users [post]
 func (uc UserController) Create(c *gin.Context) {
 	request := CreateUserRequest{}
 
@@ -88,6 +90,7 @@ func (uc UserController) Create(c *gin.Context) {
 }
 
 // GetById godoc
+// @Id GetUser
 // @Summary Get user by id
 // @Schemes http
 // @Description Get user by id
@@ -96,7 +99,7 @@ func (uc UserController) Create(c *gin.Context) {
 // @Produce json
 // @Param id path string true "User ID"
 // @Success 200 {object} UserResponse "ok"
-// @Router /{id} [get]
+// @Router /users/{id} [get]
 func (uc UserController) GetById(c *gin.Context) {
 	uri := ManipulateUri{}
 
@@ -130,6 +133,7 @@ func (uc UserController) GetById(c *gin.Context) {
 }
 
 // Update godoc
+// @Id UpdateUser
 // @Summary Update user
 // @Schemes http
 // @Description Update user
@@ -138,7 +142,7 @@ func (uc UserController) GetById(c *gin.Context) {
 // @Produce json
 // @Param id path string true "User ID"
 // @Success 200 {object} UserResponse "ok"
-// @Router /{id} [put]
+// @Router /users/{id} [put]
 func (uc UserController) Update(c *gin.Context) {
 	uri := ManipulateUri{}
 
@@ -180,6 +184,7 @@ func (uc UserController) Update(c *gin.Context) {
 }
 
 // PartialUpdate godoc
+// @Id PartialUpdateUser
 // @Summary Partial update user
 // @Schemes http
 // @Description Partial update user
@@ -188,7 +193,7 @@ func (uc UserController) Update(c *gin.Context) {
 // @Produce json
 // @Param id path string true "User ID"
 // @Success 200 {object} UserResponse "ok"
-// @Router /{id} [patch]
+// @Router /users/{id} [patch]
 func (uc UserController) PartialUpdate(c *gin.Context) {
 	uri := ManipulateUri{}
 
@@ -228,6 +233,7 @@ func (uc UserController) PartialUpdate(c *gin.Context) {
 }
 
 // Delete godoc
+// @Id DeleteUser
 // @Summary Delete user
 // @Schemes http
 // @Description Delete user
@@ -236,7 +242,7 @@ func (uc UserController) PartialUpdate(c *gin.Context) {
 // @Produce json
 // @Param id path string true "User ID"
 // @Success 200
-// @Router /{id} [delete]
+// @Router /users/{id} [delete]
 func (uc UserController) Delete(c *gin.Context) {
 	uri := ManipulateUri{}
 

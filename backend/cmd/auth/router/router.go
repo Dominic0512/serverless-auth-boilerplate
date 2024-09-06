@@ -23,7 +23,7 @@ func NewRouter(
 }
 
 func (r Routes) Setup() {
-	docs.SwaggerInfo.BasePath = "/api/auth"
+	docs.SwaggerInfo.BasePath = "/api/v1"
 	for _, route := range r {
 		route.Setup()
 	}

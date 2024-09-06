@@ -14,13 +14,14 @@ definitions:
 info:
   contact: {}
 paths:
-  /oauth-url:
+  /auth/oauth-url:
     get:
       consumes:
       - application/json
       description: Currently, the authorization is integrated with Auth0. This endpoint
         will generate an authorization URL for the client to redirect to the Auth0
         login page.
+      operationId: GenerateAuthURL
       produces:
       - application/json
       responses:
@@ -31,11 +32,12 @@ paths:
       summary: Generate oauth login url
       tags:
       - Auth
-  /sign-in:
+  /auth/sign-in:
     post:
       consumes:
       - application/json
       description: SignIn with oauth code
+      operationId: SignIn
       produces:
       - application/json
       responses:
@@ -46,11 +48,12 @@ paths:
       summary: SignIn with oauth code
       tags:
       - Auth
-  /sign-up:
+  /auth/sign-up:
     post:
       consumes:
       - application/json
       description: SignUp with oauth code
+      operationId: SignUp
       produces:
       - application/json
       responses:
